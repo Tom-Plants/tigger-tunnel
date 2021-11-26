@@ -1,5 +1,5 @@
 const Client = require('net').Socket;
-const Server = require('net').Server;
+const {Server, createServer} = require('net').Server;
 
 const   tunnel_num = 8;                 //通道数
 const   target_port = 8080;             //服务器端口
