@@ -60,7 +60,6 @@ function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
     num_buffer.writeInt8(current_packet_num, 4);
     num_buffer.writeUInt16LE(referPort, 5);
     let send_buffer = Buffer.concat([num_buffer, data]);
-    console.log(send_buffer);
 
     for(let i of clients) {
         if(i._paused == false) {

@@ -64,7 +64,6 @@ function init_server() {
                 let pkt_num = data.readInt8(0);
                 let num = data.readUInt16LE(1);
                 let real_data = data.slice(3);
-                console.log(real_data);
                 if(real_data.length == 5 && pkt_num == -1) {
                     let cmd = real_data.toString();
                     if(cmd == "PTCLS") {
