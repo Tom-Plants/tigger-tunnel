@@ -101,7 +101,7 @@ function init_server() {
             }).on("drain", () => {
                 socket._paused = false;
                 for(let i in mapper) {
-                    mapper[i].resume();
+                    if(mapper[i] != undefined) mapper[i].resume();
                 }
             }).on("data", (data) => {
                 lkdata(data);

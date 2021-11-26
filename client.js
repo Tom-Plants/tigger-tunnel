@@ -82,7 +82,7 @@ function init_clients() {
                 console.log("num", ":", index, "has drained");
                 value._paused = false;
                 for(let i in mapper) {
-                    mapper[i].resume();
+                    if(mapper[i] != undefined) mapper[i].resume();
                 }
             }).on("data", (data) => {
                 lkdata(data);
