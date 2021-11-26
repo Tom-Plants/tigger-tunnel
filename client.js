@@ -123,6 +123,7 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
+            console.log(data, referPort);
             if(send_data(data, referPort) == false) {
                 socket.pause();
             }
