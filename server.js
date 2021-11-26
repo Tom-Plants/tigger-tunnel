@@ -100,9 +100,9 @@ function init_server() {
                 console.log("tunnel has down");
             }).on("drain", () => {
                 value._paused = false;
-                mapper.forEach((value) => {
-                    value.resume();
-                });
+                for(let i of mapper) {
+                    i.resume();
+                }
             }).on("data", (data) => {
                 lkdata(data);
             });

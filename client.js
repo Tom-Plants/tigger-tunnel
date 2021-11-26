@@ -81,9 +81,9 @@ function init_clients() {
             }).on("drain", () => {
                 console.log("num", ":", index, "has drained");
                 value._paused = false;
-                mapper.forEach((value) => {
-                    value.resume();
-                });
+                for(let i of mapper) {
+                    i.resume();
+                }
             }).on("data", (data) => {
                 lkdata(data);
             });
