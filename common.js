@@ -61,24 +61,24 @@ function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
     num_buffer.writeUInt16LE(referPort, 5);
     let send_buffer = Buffer.concat([num_buffer, data]);
 
-    for(let i of clients) {
-        if(i._paused == false) {
-            //表明没有阻塞，那么发送数据
+    //for(let i of clients) {
+        //if(i._paused == false) {
+            ////表明没有阻塞，那么发送数据
 
-            let send_block = i.write(send_buffer);
+            //let send_block = i.write(send_buffer);
 
-            if(!send_block) {
-                //发送后阻塞
-                i._paused = true;
-            }else {
-                i._paused = false;
-            }
+            //if(!send_block) {
+                ////发送后阻塞
+                //i._paused = true;
+            //}else {
+                //i._paused = false;
+            //}
 
-            return send_block;
-        }
-    }
+            //return send_block;
+        //}
+    //}
     //随便选一个通道发出去
-    clients[0].write(send_buffer);
+    return clients[0].write(send_buffer);
     return false;
 }
 
