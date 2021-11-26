@@ -5,14 +5,14 @@ function pk_handle(callback, referPort) {
     let rp = referPort;
     return (pkt_num, data) => {
         if(pkt_num == recv_count) {
-            cb(data, rp);
+            cb(data, rp, recv_count);
             while(true) {
                 recv_count ++;
                 if(recv_count == 128) {
                     recv_count = 0
                 }
                 if(buffer[recv_count] != undefined) {
-                    cb(buffer[recv_count], rp);
+                    cb(buffer[recv_count], rp, recv_count);
                 }else break;
             }
         }else {

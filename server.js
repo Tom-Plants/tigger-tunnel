@@ -136,8 +136,8 @@ function init_server() {
     }
 }
 
-function data_recive(data, referPort) {
-    console.log(referPort, data);
+function data_recive(data, referPort, pkt) {
+    console.log(referPort, pkt, data);
     if(mapper[referPort] != undefined) {
         if(mapper[referPort].s.write(data) == false) {
             send_data(Buffer.from("PTSTP"), referPort, -1);
