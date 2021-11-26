@@ -28,25 +28,7 @@ function init_clients() {
             clients.push(new Client());
         }
         clients.map((value, index) => {
-            value.connect(target_port, target_host)
-            .on("connect", () => {
-                console.log(target_host, ":", target_port, "connect successfull");
-                if(++connected_count == tunnel_num) {
-                    console.log("ALL tunnel has successfull connected !");
-                    allow_data_transfer = true;
-                }
-            }).on("error", (e) => {
-                console.log(e);
-            }).on("close", () => {
-                console.log("num", ":", index, "has disconnected");
-                --connected_count;
-            }).on("drain", () => {
-                console.log("num", ":", index, "has drained");
-                value._paused = false;
-                mapper.forEach((value) => {
-                    value.resume();
-                });
-            }).on("data", (data) => {
+            let lkdata = handleData((data) => {
                 let num = data.readUInt16LE(0);
                 let real_data = data.slice(2);
 
@@ -82,6 +64,28 @@ function init_clients() {
                 if(mapper[num].write(real_data) == false) {
                     send_data(Buffer.from("PTSTP", num));
                 }
+
+            });
+            value.connect(target_port, target_host)
+            .on("connect", () => {
+                console.log(target_host, ":", target_port, "connect successfull");
+                if(++connected_count == tunnel_num) {
+                    console.log("ALL tunnel has successfull connected !");
+                    allow_data_transfer = true;
+                }
+            }).on("error", (e) => {
+                console.log(e);
+            }).on("close", () => {
+                console.log("num", ":", index, "has disconnected");
+                --connected_count;
+            }).on("drain", () => {
+                console.log("num", ":", index, "has drained");
+                value._paused = false;
+                mapper.forEach((value) => {
+                    value.resume();
+                });
+            }).on("data", (data) => {
+                lkdata(data);
             });
         });
     };
@@ -90,15 +94,14 @@ function send_data(data, referPort) {
     for(let i of clients) {
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
-            let num_buffer = Buffer.allocUnsafe(2);
-            num_buffer.writeUInt16LE(referPort);
-            let send_buffer = Buffer.concat([num_buffer, data]);
+            let num_buffer = Buffer.allocUnsafe(6);
+            num_buffer.writeUInt32LE(data.length + 2, 0);
+            num_buffer.writeUInt16LE(referPort, 4);
 
-            let send_block = i.write(send_buffer);
+            let send_block = i.write(Buffer.concat([num_buffer, data]));
 
             if(!send_block) {
                 //发送后阻塞
-                console.log("发送阻塞");
                 i._paused = true;
             }
 
@@ -137,4 +140,50 @@ function init_local_server() {
         mapper[referPort] = socket;
         send_data(Buffer.from("COPEN"), referPort);
     }).listen({port: local_port, host: local_host});
+}
+
+/**
+ * 处理粘包分包
+ * @param data 处理粘包分包
+ */
+function handleData(callback) {
+    let packetData = null;
+    let value = (callback == undefined ? () => {} : callback);
+    return (data) => {
+        let d1 = data;
+        if(packetData != null) { d1 = Buffer.concat([packetData, d1]); }
+        let packet_length;
+        while(true) {
+            if(d1.length <= 4)
+            {
+                packetData = d1;
+                break;
+            }
+            packet_length = d1.readUInt32LE(0);
+
+            if(packet_length == d1.length - 4)
+            {
+                packetData = null;
+                value(d1.slice(4, d1.length));
+                break;
+            }else {
+                if(packet_length > d1.length - 4) //没接收完
+                {
+                    packetData = d1;
+                    break;
+                }
+                else if(packet_length < d1.length - 4) //接过头了
+                {
+                    //有可能多次接过头，则循环处理
+                    let left = d1.slice(4, packet_length + 4);
+                    let right = d1.slice(packet_length + 4, d1.length);
+
+                    value(left);
+                    packetData = right;
+                    d1 = right;
+                }
+            }
+
+        }
+    };
 }

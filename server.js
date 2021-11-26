@@ -29,17 +29,7 @@ function init_server() {
                 return;
             }
 
-            socket.on("error", (e) => {
-                console.log(e);
-            }).on("close", () => {
-                --connected_count;
-                console.log("tunnel has down");
-            }).on("drain", () => {
-                value._paused = false;
-                mapper.forEach((value) => {
-                    value.resume();
-                });
-            }).on("data", (data) => {
+            let lkdata = handleData((data) => {
                 let num = data.readUInt16LE(0);
                 let real_data = data.slice(2);
                 if(real_data.length == 5) {
@@ -106,6 +96,20 @@ function init_server() {
 
             });
 
+            socket.on("error", (e) => {
+                console.log(e);
+            }).on("close", () => {
+                --connected_count;
+                console.log("tunnel has down");
+            }).on("drain", () => {
+                value._paused = false;
+                mapper.forEach((value) => {
+                    value.resume();
+                });
+            }).on("data", (data) => {
+                lkdata(data);
+            });
+
             clients.push(socket);
         }).listen({port: local_port, host: local_host});
     }
@@ -115,7 +119,9 @@ function send_data(data, referPort) {
         console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
-            let num_buffer = Buffer.allocUnsafe(2).writeUInt16LE(referPort);
+            let num_buffer = Buffer.allocUnsafe(6);
+            num_buffer.writeUInt32LE(data.length + 2, 0);
+            num_buffer.writeUInt16LE(referPort, 4);
 
             let send_block = i.write(Buffer.concat([num_buffer, data]));
 
@@ -127,4 +133,50 @@ function send_data(data, referPort) {
             return send_block;
         }
     }
+}
+
+/**
+ * 处理粘包分包
+ * @param data 处理粘包分包
+ */
+function handleData(callback) {
+    let packetData = null;
+    let value = (callback == undefined ? () => {} : callback);
+    return (data) => {
+        let d1 = data;
+        if(packetData != null) { d1 = Buffer.concat([packetData, d1]); }
+        let packet_length;
+        while(true) {
+            if(d1.length <= 4)
+            {
+                packetData = d1;
+                break;
+            }
+            packet_length = d1.readUInt32LE(0);
+
+            if(packet_length == d1.length - 4)
+            {
+                packetData = null;
+                value(d1.slice(4, d1.length));
+                break;
+            }else {
+                if(packet_length > d1.length - 4) //没接收完
+                {
+                    packetData = d1;
+                    break;
+                }
+                else if(packet_length < d1.length - 4) //接过头了
+                {
+                    //有可能多次接过头，则循环处理
+                    let left = d1.slice(4, packet_length + 4);
+                    let right = d1.slice(packet_length + 4, d1.length);
+
+                    value(left);
+                    packetData = right;
+                    d1 = right;
+                }
+            }
+
+        }
+    };
 }
