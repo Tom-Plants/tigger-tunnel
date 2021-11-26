@@ -63,29 +63,31 @@ function init_clients() {
                 }
 
             });
-            clients.push(
-                createConnection({host: target_host, port: target_port}, () => {
-                    console.log(target_host, ":", target_port, "connect successfull");
-                    if(++connected_count == tunnel_num) {
-                        console.log("ALL tunnel has successfull connected !");
-                        allow_data_transfer = true;
-                    }
-                })
-                .on("error", (e) => {
-                    console.log(e);
-                }).on("close", () => {
-                    console.log("num", ":", i, "has disconnected");
-                    --connected_count;
-                }).on("drain", () => {
-                    console.log("num", ":", i, "has drained");
-                    value._paused = false;
-                    for(let j in mapper) {
-                        if(mapper[j] != undefined) mapper[j].resume();
-                    }
-                }).on("data", (data) => {
-                    lkdata(data);
-                })
-            );
+            let client = createConnection({host: target_host, port: target_port}, () => {
+                console.log(target_host, ":", target_port, "connect successfull");
+                if(++connected_count == tunnel_num) {
+                    console.log("ALL tunnel has successfull connected !");
+                    allow_data_transfer = true;
+                }
+            })
+            .on("error", (e) => {
+                console.log(e);
+            }).on("close", () => {
+                console.log("num", ":", i, "has disconnected");
+                --connected_count;
+            }).on("drain", () => {
+                console.log("num", ":", i, "has drained");
+                value._paused = false;
+                for(let j in mapper) {
+                    if(mapper[j] != undefined) mapper[j].resume();
+                }
+            }).on("data", (data) => {
+                lkdata(data);
+            });
+
+            client._paused = false;
+
+            clients.push(client);
         }
     };
 }
