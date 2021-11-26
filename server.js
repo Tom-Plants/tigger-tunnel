@@ -78,7 +78,10 @@ function init_server() {
                                 mapper[num].destroy();
                                 mapper[num] = undefined;
                             }
-                        }).on("error", () => {})
+                        })
+                        .on("error", (e) => {
+                            console.log(e);
+                        })
                         .on("drain", () => {
                             send_data(Buffer.from("PTCTN"), num);
                         }).setKeepAlive(true, 200);
