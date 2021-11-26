@@ -64,7 +64,7 @@ function init_server() {
                         }).on("data", (data) => {
                             if(send_data(data, num) == false) {
                                 conn.pause();
-                                console.log(referPort, "tunnel塞住了,推不出去");
+                                console.log(num, "tunnel塞住了,推不出去");
                             }
                         }).on("close", () => {
                             send_data(Buffer.from("PTCLS", num));
