@@ -110,6 +110,7 @@ function init_server() {
                 console.log("tunnel has down");
             }).on("drain", () => {
                 socket._paused = false;
+                print_allow_write(clients);
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].resume();
                 }
