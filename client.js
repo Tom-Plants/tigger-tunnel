@@ -95,7 +95,6 @@ function init_clients() {
 function send_data(data, referPort) {
     for(let i of clients) {
         if(i._paused == false || i._paused == undefined) {
-            console.log(referPort, data);
             //表明没有阻塞，那么发送数据
             let num_buffer = Buffer.allocUnsafe(6);
             num_buffer.writeUInt32LE(data.length + 2, 0);
@@ -106,6 +105,7 @@ function send_data(data, referPort) {
             if(!send_block) {
                 //发送后阻塞
                 i._paused = true;
+                console.log(referPort, "tunnel塞住了,推不出去");
             }
 
             return send_block;
