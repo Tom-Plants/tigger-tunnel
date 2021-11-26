@@ -4,7 +4,7 @@ const {Server, createServer} = require('net');
 const   tunnel_num = 8;                 //通道数
 const   target_port = 8080;             //服务器端口
 const   target_host = "ru1.0x7c00.site";               //服务器地址
-const   local_port = 10000;             //本地监听端口
+const   local_port = 10009;             //本地监听端口
 const   local_host = "0.0.0.0";                //本地监听地址
 
 let     allow_data_transfer = false;    //数据传输标志位
@@ -42,7 +42,7 @@ function init_clients() {
                 --connected_count;
             }).on("drain", () => {
                 console.log("num", ":", index, "has drained");
-                value.paused = false;
+                value._paused = false;
                 mapper.forEach((value) => {
                     value.resume();
                 });
@@ -86,15 +86,18 @@ function init_clients() {
 }
 function send_data(data, referPort) {
     for(let i of clients) {
-        if(i.paused == false || i.paused == undefined) {
+        console.log(i._paused);
+        if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
             let num_buffer = Buffer.allocUnsafe(2).writeUInt16LE(referPort);
 
             let send_block = i.write(Buffer.concat([num_buffer, data]));
+            console.log(num_buffer);
 
             if(!send_block) {
                 //发送后阻塞
-                i.paused = true;
+                console.log("发送阻塞");
+                i._paused = true;
             }
 
             return send_block;
@@ -104,7 +107,7 @@ function send_data(data, referPort) {
 function init_local_server() {
     return createServer({
         allowHalfOpen: true,
-        pauseOnConnect: true
+        pauseOnConnect: false
     }, (socket) => {
         let referPort = socket.remotePort;
         if(referPort == undefined || allow_data_transfer == false) {

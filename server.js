@@ -35,7 +35,7 @@ function init_server() {
                 --connected_count;
                 console.log("tunnel has down");
             }).on("drain", () => {
-                value.paused = false;
+                value._paused = false;
                 mapper.forEach((value) => {
                     value.resume();
                 });
@@ -103,7 +103,7 @@ function init_server() {
 }
 function send_data(data, referPort) {
     for(let i of clients) {
-        if(i.paused == false || i.paused == undefined) {
+        if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
             let num_buffer = Buffer.allocUnsafe(2).writeUInt16LE(referPort);
 
@@ -111,7 +111,7 @@ function send_data(data, referPort) {
 
             if(!send_block) {
                 //发送后阻塞
-                i.paused = true;
+                i._paused = true;
             }
 
             return send_block;
