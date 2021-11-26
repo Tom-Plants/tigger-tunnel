@@ -23,49 +23,51 @@ function clear_clients() {
 
 }
 
-let lkdata = handleData((data) => {
-    let num = data.readUInt16LE(0);
-    let real_data = data.slice(2);
-    if(real_data.length == 5) {
-        let cmd = real_data.toString();
-        if(cmd == "PTCLS") {
-            if(mapper[num] != undefined) {
-                mapper[num].destroy();
-                mapper[num] = undefined;
-            }
-            return;
-        }else if(cmd == "SHALF") {
-            if(mapper[num] != undefined) {
-                mapper[num].end();
-            }
-            return;
-        }else if(cmd == "PTCTN") {
-            if(mapper[num] != undefined) {
-                mapper[num].resume();
-            }
-            return;
-        }else if(cmd == "PTSTP") {
-            if(mapper[num] != undefined) {
-                //mapper[num].pause();
-            }
-            return;
-        }
-
-    }
-    
-    if(mapper[num] != undefined) {
-        if(mapper[num].write(real_data) == false) {
-            send_data(Buffer.from("PTSTP"), num);
-        }
-    }
-
-});
 
 function init_clients() {
     let connected_count = 0;
     
     return () => {
         for(let i = 0; i < tunnel_num; i++) {
+
+            let lkdata = handleData((data) => {
+                let num = data.readUInt16LE(0);
+                let real_data = data.slice(2);
+                if(real_data.length == 5) {
+                    let cmd = real_data.toString();
+                    if(cmd == "PTCLS") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].destroy();
+                            mapper[num] = undefined;
+                        }
+                        return;
+                    }else if(cmd == "SHALF") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].end();
+                        }
+                        return;
+                    }else if(cmd == "PTCTN") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].resume();
+                        }
+                        return;
+                    }else if(cmd == "PTSTP") {
+                        if(mapper[num] != undefined) {
+                            //mapper[num].pause();
+                        }
+                        return;
+                    }
+
+                }
+                
+                if(mapper[num] != undefined) {
+                    if(mapper[num].write(real_data) == false) {
+                        send_data(Buffer.from("PTSTP"), num);
+                    }
+                }
+
+            });
+
             let client = createConnection({host: target_host, port: target_port}, () => {
                 console.log(target_host, ":", target_port, "connect successfull");
                 if(++connected_count == tunnel_num) {

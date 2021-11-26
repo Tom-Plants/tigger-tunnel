@@ -15,46 +15,6 @@ let     mapper = {};
 
 init_server()();
 
-let lkdata = handleData((data) => {
-    let num = data.readUInt16LE(0);
-    let real_data = data.slice(2);
-    if(real_data.length == 5) {
-        let cmd = real_data.toString();
-        if(cmd == "PTCLS") {
-            if(mapper[num] != undefined) {
-                mapper[num].destroy();
-                mapper[num] = undefined;
-            }
-            return;
-        }else if(cmd == "CHALF") {
-            if(mapper[num] != undefined) {
-                mapper[num].end();
-            }
-            return;
-        }else if(cmd == "PTCTN") {
-            if(mapper[num] != undefined) {
-                mapper[num].resume();
-            }
-            return;
-        }else if(cmd == "PTSTP") {
-            if(mapper[num] != undefined) {
-                //mapper[num].pause();
-            }
-            return;
-        }else if(cmd == "COPEN") {
-            new_outgoing(num);
-            return;
-        }
-
-    }
-    
-    if(mapper[num] != undefined) {
-        if(mapper[num].write(real_data) == false) {
-            send_data(Buffer.from("PTSTP"), num);
-        }
-    }
-
-});
 
 function new_outgoing(num) {
     let conn = createConnection({host: target_host, port: target_port, allowHalfOpen: true}, () => {
@@ -90,6 +50,46 @@ function init_server() {
     
     return () => {
         createServer({}, (socket) => {
+            let lkdata = handleData((data) => {
+                let num = data.readUInt16LE(0);
+                let real_data = data.slice(2);
+                if(real_data.length == 5) {
+                    let cmd = real_data.toString();
+                    if(cmd == "PTCLS") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].destroy();
+                            mapper[num] = undefined;
+                        }
+                        return;
+                    }else if(cmd == "CHALF") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].end();
+                        }
+                        return;
+                    }else if(cmd == "PTCTN") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].resume();
+                        }
+                        return;
+                    }else if(cmd == "PTSTP") {
+                        if(mapper[num] != undefined) {
+                            //mapper[num].pause();
+                        }
+                        return;
+                    }else if(cmd == "COPEN") {
+                        new_outgoing(num);
+                        return;
+                    }
+
+                }
+                
+                if(mapper[num] != undefined) {
+                    if(mapper[num].write(real_data) == false) {
+                        send_data(Buffer.from("PTSTP"), num);
+                    }
+                }
+
+            });
             // socket._paused = false;
             ++connected_count;
             if(connected_count == tunnel_num) {
