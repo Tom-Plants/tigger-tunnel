@@ -15,31 +15,6 @@ let     mapper = {};
 
 init_server()();
 
-clients.map((value, index) => {
-    value.connect(target_port, target_host)
-    .on("connect", () => {
-        console.log(target_host, ":", target_port, "connect successfull");
-        if(++connected_count == tunnel_num) {
-            console.log("ALL tunnel has successfull connected !");
-            allow_data_transfer = true;
-        }
-    }).on("error", (e) => {
-        console.log(e);
-    }).on("close", () => {
-        console.log("num", ":", index, "has disconnected");
-        --connected_count;
-    }).on("drain", () => {
-        console.log("num", ":", index, "has drained");
-        value.paused = false;
-        mapper.forEach((value) => {
-            value.resume();
-        });
-    });
-});
-
-init_local_server();
-
-
 function init_server() {
     let connected_count = 0;
     
