@@ -109,8 +109,7 @@ function init_server() {
                 }
                 
                 if(mapper[num] != undefined) {
-                    console.log(num, mapper[num]);
-                    if(mapper[num].write(real_data) == false) {
+                    if(mapper[num].s.write(real_data) == false) {
                         send_data(Buffer.from("PTSTP"), num, -1);
                     }
                 }
