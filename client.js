@@ -107,6 +107,8 @@ function send_data(data, referPort) {
                 //发送后阻塞
                 i._paused = true;
                 console.log(referPort, "tunnel塞住了,推不出去");
+            }else {
+                i._paused = false;
             }
 
             return send_block;
