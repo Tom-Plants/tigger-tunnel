@@ -115,7 +115,6 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
-            console.log(">>>", referPort, data);
             if(send_data(data, referPort) == false) {
                 socket.pause();
                 console.log(referPort, "tunnel塞住了,推不出去");
@@ -131,5 +130,6 @@ function init_local_server() {
 }
 
 function send_data(data, referPort) {
+    console.log(">>>", referPort, data);
     sd(data, referPort, clients);
 }
