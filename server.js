@@ -67,6 +67,7 @@ function init_server() {
                         }
                         return;
                     }else if(cmd == "COPEN") {
+                        console.log("copen 了");
                         let conn = createConnection({host: target_host, port: target_port}, () => {
                             send_data(Buffer.from("PTCTN", num));
                         }).on("end", () => {
