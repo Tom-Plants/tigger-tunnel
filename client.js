@@ -5,7 +5,7 @@ const sd = require("./common").send_data;
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 
-const   tunnel_num = 2;                 //通道数
+const   tunnel_num = 8;                 //通道数
 const   target_port = 8080;             //服务器端口
 const   target_host = "ru1.0x7c00.site";               //服务器地址
 const   local_port = 10009;             //本地监听端口

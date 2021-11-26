@@ -78,7 +78,8 @@ function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
         }
     }
     //随便选一个通道发出去
-    return clients[0].write(send_buffer);
+    let n = randomInt(tunnel_num);
+    return clients[n].write(send_buffer);
 }
 
 module.exports = {
