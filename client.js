@@ -86,13 +86,13 @@ function init_clients() {
 }
 function send_data(data, referPort) {
     for(let i of clients) {
-        console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
-            let num_buffer = Buffer.allocUnsafe(2).writeUInt16LE(referPort);
+            let num_buffer = Buffer.allocUnsafe(2);
+            num_buffer.writeUInt16LE(referPort);
+            let send_buffer = Buffer.concat([num_buffer, data]);
 
-            let send_block = i.write(Buffer.concat([num_buffer, data]));
-            console.log(num_buffer);
+            let send_block = i.write(send_buffer);
 
             if(!send_block) {
                 //发送后阻塞
