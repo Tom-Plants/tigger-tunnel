@@ -34,7 +34,6 @@ function init_server() {
                 let real_data = data.slice(2);
                 if(real_data.length == 5) {
                     let cmd = real_data.toString();
-                    console.log(cmd);
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
                             mapper[num] = undefined;
@@ -57,7 +56,6 @@ function init_server() {
                         }
                         return;
                     }else if(cmd == "COPEN") {
-                        console.log("copen 了");
                         let conn = createConnection({host: target_host, port: target_port}, () => {
                             send_data(Buffer.from("PTCTN", num));
                         }).on("end", () => {
@@ -82,7 +80,6 @@ function init_server() {
 
                         mapper[num] = conn;
                         send_data(Buffer.from("PTCTN"), num);
-                        console.log("PTCTN to ", num);
                         return;
                     }
 
@@ -116,7 +113,6 @@ function init_server() {
 }
 function send_data(data, referPort) {
     for(let i of clients) {
-        console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
             let num_buffer = Buffer.allocUnsafe(6);
