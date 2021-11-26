@@ -62,6 +62,7 @@ function init_server() {
                         }).on("end", () => {
                             send_data(Buffer.from("SHALF"), num);
                         }).on("data", (data) => {
+                            print_allow_write();
                             if(send_data(data, num) == false) {
                                 conn.pause();
                                 console.log(num, "tunnel塞住了,推不出去");
@@ -102,7 +103,6 @@ function init_server() {
                 console.log("tunnel has down");
             }).on("drain", () => {
                 socket._paused = false;
-                console.log("有tunnel空闲了!");
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].resume();
                 }
@@ -186,4 +186,12 @@ function handleData(callback) {
 
         }
     };
+}
+
+function print_allow_write() {
+    let count = 0;
+    for(let i of clients) {
+        if(i._paused == false) count++;
+    }
+    console.log("可写管道：", count);
 }

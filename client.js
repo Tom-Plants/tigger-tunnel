@@ -135,6 +135,7 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
+            print_allow_write();
             if(send_data(data, referPort) == false) {
                 socket.pause();
                 console.log(referPort, "tunnel塞住了,推不出去");
@@ -193,4 +194,12 @@ function handleData(callback) {
 
         }
     };
+}
+
+function print_allow_write() {
+    let count = 0;
+    for(let i of clients) {
+        if(i._paused == false) count++;
+    }
+    console.log("可写管道：", count);
 }
