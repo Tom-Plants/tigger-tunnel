@@ -2,6 +2,8 @@ const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
 const sd = require("./common").send_data;
+const ph = require("./packet_handler").pk_handle;
+const st = require("./packet_handler").st_handle;
 
 const   tunnel_num = 8;                 //通道数
 const   target_port = 8080;             //服务器端口
@@ -39,6 +41,8 @@ function init_clients() {
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
                             mapper[num].s.destroy();
+                            mapper[num].rh = undefined;
+                            mapper[num].sh = undefined;
                             mapper[num] = undefined;
                         }
                         return;
@@ -62,27 +66,7 @@ function init_clients() {
                 }
                 
                 if(mapper[num] != undefined) {
-                    mapper[num].recv_handle[pkt_num] = {
-                        data: real_data,
-                        next: (pkt_num + 1) == 128 ? 0: pkt_num + 1
-                    }
-
-                    let k = true;
-                    while(true) {
-                        if(mapper[num].current_needed == pkt_num && mapper[num].recv_handle[pkt_num] != undefined) {
-                            if(mapper[num].s.write(mapper[num].recv_handle[pkt_num].data) == false) {
-                                if(k) {
-                                    send_data(Buffer.from("PTSTP"), num, -1);
-                                    k = false;
-                                }
-                            }
-                            mapper[num].current_needed ++;
-                            if(mapper[num].current_needed == 128) {
-                                mapper[num].current_needed = 0;
-                            }
-                            pkt_num = mapper[num].recv_handle[pkt_num].next;
-                        }else {break;}
-                    }
+                    mapper[num].rh(pkt_num, real_data);
                 }
 
             });
@@ -126,20 +110,21 @@ function init_local_server() {
             socket.destroy();
             return;
         }
+        //注意释放
+        mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort)};
+
         socket.on("close", () => {
             send_data(Buffer.from("PTCLS"), referPort, -1);
             if(mapper[referPort] != undefined){
                 mapper[referPort].s.destroy();
+                mapper[referPort].rh = undefined;
+                mapper[referPort].sh = undefined;
                 mapper[referPort] = undefined;
             }
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort, -1);
         }).on("data", (data) => {
-            let cur = mapper[referPort].send_count;
-            mapper[referPort].send_count ++;
-            if(mapper[referPort].send_count == 128) {
-                mapper[referPort].send_count = 0;
-            }
+            let cur = mapper[referPort].sh();
             if(send_data(data, referPort, cur) == false) {
                 socket.pause();
                 //console.log(referPort, "tunnel塞住了,推不出去");
@@ -149,14 +134,17 @@ function init_local_server() {
             send_data(Buffer.from("PTCTN"), referPort, -1);
         }).setKeepAlive(true, 200);
 
-        mapper[referPort] = {
-            s:socket,
-            recv_handle: {},
-            current_needed: 0,
-            send_count: 0
-        };
+
         send_data(Buffer.from("COPEN"), referPort, -1);
     }).listen({port: local_port, host: local_host});
+}
+
+function data_recive(data, referPort) {
+    if(mapper[referPort] != undefined) {
+        if(mapper[referPort].s.write(data) == false) {
+            send_data(Buffer.from("PTSTP"), num, -1);
+        }
+    }
 }
 
 function send_data(data, referPort, current_packet_num) {

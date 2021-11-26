@@ -2,6 +2,8 @@ const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
 const sd = require("./common").send_data;
+const ph = require("./packet_handler").pk_handle;
+const st = require("./packet_handler").st_handle;
 
 const   tunnel_num = 8;                 //通道数
 const   target_port = 444;             //服务器端口
@@ -17,16 +19,22 @@ init_server()();
 
 
 function new_outgoing(num) {
+
+
     let conn = createConnection({host: target_host, port: target_port, allowHalfOpen: true}, () => {
         send_data(Buffer.from("PTCTN"), num, -1);
-    }).on("end", () => {
+    });
+
+    mapper[num] = {
+        s:conn,
+        sh: st(),
+        rh: ph(data_recive, num)
+    };
+
+    conn.on("end", () => {
         send_data(Buffer.from("SHALF"), num, -1);
     }).on("data", (data) => {
-        let cur = mapper[num].send_count;
-        mapper[num].send_count ++;
-        if(mapper[num].send_count == 128) {
-            mapper[num].send_count = 0;
-        }
+        let cur = mapper[num].sh();
         if(send_data(data, num, cur) == false) {
             conn.pause();
             // console.log(num, "tunnel塞住了,推不出去");
@@ -45,14 +53,16 @@ function new_outgoing(num) {
         send_data(Buffer.from("PTCTN"), num, -1);
     }).setKeepAlive(true, 200);
 
-    mapper[num] = {
-        s:conn,
-        recv_handle: {},
-        current_needed: 0,
-        send_count: 0
-    };
     send_data(Buffer.from("PTCTN"), num, -1);
 
+}
+
+function data_recive(data, referPort) {
+    if(mapper[referPort] != undefined) {
+        if(mapper[referPort].s.write(data) == false) {
+            send_data(Buffer.from("PTSTP"), num, -1);
+        }
+    }
 }
 
 function init_server() {
@@ -95,30 +105,8 @@ function init_server() {
                 }
                 
                 if(mapper[num] != undefined) {
-
-                    mapper[num].recv_handle[pkt_num] = {
-                        data: real_data,
-                        next: (pkt_num + 1) == 128 ? 0: pkt_num + 1
-                    }
-
-                    let k = true;
-                    while(true) {
-                        if(mapper[num].current_needed == pkt_num && mapper[num].recv_handle[pkt_num] != undefined) {
-                            console.log(mapper[num].current_needed, pkt_num, mapper[num].recv_handle[pkt_num]);
-                            if(mapper[num].s.write(mapper[num].recv_handle[pkt_num].data) == false) {
-                                if(k) {
-                                    send_data(Buffer.from("PTSTP"), num, -1);
-                                    k = false;
-                                }
-                            }
-                            mapper[num].current_needed ++;
-                            if(mapper[num].current_needed == 128) {
-                                mapper[num].current_needed = 0;
-                            }
-                            pkt_num = mapper[num].recv_handle[pkt_num].next;
-                        }else {
-                            break;
-                        }
+                    if(mapper[num].write(real_data) == false) {
+                        send_data(Buffer.from("PTSTP"), num, -1);
                     }
                 }
 
