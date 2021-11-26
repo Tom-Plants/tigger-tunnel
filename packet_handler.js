@@ -25,11 +25,10 @@ function pk_handle(callback, referPort) {
 function st_handle() {
     let send_count = 0;
     return () => {
-        send_count++;
         if(send_count == 128) {
             send_count = 0;
         }
-        return send_count;
+        return send_count++;
     }
 }
 
