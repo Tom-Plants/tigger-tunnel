@@ -35,7 +35,7 @@ function init_clients() {
                 console.log(num, real_data);
 
                 if(real_data.length == 5) {
-                    let cmd = data.toString();
+                    let cmd = real_data.toString();
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
                             mapper[num] = undefined;

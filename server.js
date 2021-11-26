@@ -33,7 +33,7 @@ function init_server() {
                 let num = data.readUInt16LE(0);
                 let real_data = data.slice(2);
                 if(real_data.length == 5) {
-                    let cmd = data.toString();
+                    let cmd = real_data.toString();
                     console.log(cmd);
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
