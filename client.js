@@ -115,7 +115,7 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
-            print_allow_write();
+            print_allow_write(clients);
             if(send_data(data, referPort) == false) {
                 socket.pause();
                 console.log(referPort, "tunnel塞住了,推不出去");

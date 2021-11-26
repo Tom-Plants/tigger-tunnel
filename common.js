@@ -59,7 +59,7 @@ function send_data(data, referPort, clients) {
     let send_buffer = Buffer.concat([num_buffer, data]);
 
     for(let i of clients) {
-        if(i._paused == false || i._paused == undefined) {
+        if(i._paused == false) {
             //表明没有阻塞，那么发送数据
 
             let send_block = i.write(send_buffer);
@@ -75,6 +75,7 @@ function send_data(data, referPort, clients) {
         }
     }
     //随便选一个通道发出去
+    console.log("随便选了个通道发送了");
     let index = randomInt(tunnel_num);
     clients[index].write(send_buffer);
     return false;
