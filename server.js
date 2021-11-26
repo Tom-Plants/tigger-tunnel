@@ -101,11 +101,11 @@ function init_server() {
                         data: real_data,
                         next: (pkt_num + 1) == 128 ? 0: pkt_num + 1
                     }
-                    console.log(mapper[num].recv_handle[pkt_num]);
 
                     let k = true;
                     while(true) {
                         if(mapper[num].current_needed == pkt_num) {
+                            console.log(mapper[num].recv_handle[pkt_num]);
                             if(mapper[num].s.write(mapper[num].recv_handle[pkt_num].data) == false) {
                                 if(k) {
                                     send_data(Buffer.from("PTSTP"), num, -1);
@@ -117,7 +117,9 @@ function init_server() {
                                 mapper[num].current_needed = 0;
                             }
                             pkt_num = mapper[num].recv_handle[pkt_num].next;
-                        }else {break;}
+                        }else {
+                            break;
+                        }
                     }
                 }
 
