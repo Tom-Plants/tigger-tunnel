@@ -51,7 +51,6 @@ function print_allow_write(clients) {
     for(let i of clients) {
         if(i._paused == false) count++;
     }
-    console.log("可写管道：", count);
 }
 
 function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
@@ -78,7 +77,6 @@ function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
         }
     }
     //随便选一个通道发出去
-    console.log("随便选了个通道发送了");
     clients[0].write(send_buffer);
     return false;
 }

@@ -4,8 +4,6 @@ function pk_handle(callback, referPort) {
     let buffer = {};
     let rp = referPort;
     return (pkt_num, data) => {
-        console.log(pkt_num);
-
         if(pkt_num == recv_count) {
             cb(data, rp);
             while(true) {
