@@ -125,7 +125,6 @@ function init_local_server() {
             send_data(Buffer.from("CHALF"), referPort, -1);
         }).on("data", (data) => {
             let cur = mapper[referPort].sh();
-            console.log(referPort, cur, data);
             if(send_data(data, referPort, cur) == false) {
                 socket.pause();
                 //console.log(referPort, "tunnel塞住了,推不出去");
@@ -141,7 +140,6 @@ function init_local_server() {
 }
 
 function data_recive(data, referPort, pkt) {
-    console.log(referPort, pkt, data);
     if(mapper[referPort] != undefined) {
         if(mapper[referPort].s.write(data) == false) {
             send_data(Buffer.from("PTSTP"), referPort, -1);
