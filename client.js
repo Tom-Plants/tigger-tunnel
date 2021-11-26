@@ -1,5 +1,7 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
+const {handleData, print_allow_write} = require("./common");
+const sd = require("./common").send_data;
 
 const   tunnel_num = 8;                 //通道数
 const   target_port = 8080;             //服务器端口
@@ -77,7 +79,7 @@ function init_clients() {
                 --connected_count;
             }).on("drain", () => {
                 console.log("num", ":", i, "has drained");
-                value._paused = false;
+                client._paused = false;
                 for(let j in mapper) {
                     if(mapper[j] != undefined) mapper[j].resume();
                 }
@@ -118,6 +120,7 @@ function send_data(data, referPort) {
     clients[index].write(send_buffer);
     return false;
 }
+
 function init_local_server() {
     return createServer({
         allowHalfOpen: true,
@@ -152,56 +155,6 @@ function init_local_server() {
     }).listen({port: local_port, host: local_host});
 }
 
-/**
- * 处理粘包分包
- * @param data 处理粘包分包
- */
-function handleData(callback) {
-    let packetData = null;
-    let value = (callback == undefined ? () => {} : callback);
-    return (data) => {
-        let d1 = data;
-        if(packetData != null) { d1 = Buffer.concat([packetData, d1]); }
-        let packet_length;
-        while(true) {
-            if(d1.length <= 4)
-            {
-                packetData = d1;
-                break;
-            }
-            packet_length = d1.readUInt32LE(0);
-
-            if(packet_length == d1.length - 4)
-            {
-                packetData = null;
-                value(d1.slice(4, d1.length));
-                break;
-            }else {
-                if(packet_length > d1.length - 4) //没接收完
-                {
-                    packetData = d1;
-                    break;
-                }
-                else if(packet_length < d1.length - 4) //接过头了
-                {
-                    //有可能多次接过头，则循环处理
-                    let left = d1.slice(4, packet_length + 4);
-                    let right = d1.slice(packet_length + 4, d1.length);
-
-                    value(left);
-                    packetData = right;
-                    d1 = right;
-                }
-            }
-
-        }
-    };
-}
-
-function print_allow_write() {
-    let count = 0;
-    for(let i of clients) {
-        if(i._paused == false) count++;
-    }
-    console.log("可写管道：", count);
+function send_data(data, referPort) {
+    sd(data, referPort, clients);
 }
