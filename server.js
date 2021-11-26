@@ -10,13 +10,82 @@ const   target_host = "localhost";               //服务器地址
 const   local_port = 8080;             //本地监听端口
 const   local_host = "0.0.0.0";                //本地监听地址
 
-let     allow_data_transfer = false;    //数据传输标志位
-
 let     clients = [];
 let     pending_data = [];
 let     mapper = {};
 
 init_server()();
+
+let lkdata = handleData((data) => {
+    let num = data.readUInt16LE(0);
+    let real_data = data.slice(2);
+    if(real_data.length == 5) {
+        let cmd = real_data.toString();
+        if(cmd == "PTCLS") {
+            if(mapper[num] != undefined) {
+                mapper[num].destroy();
+                mapper[num] = undefined;
+            }
+            return;
+        }else if(cmd == "CHALF") {
+            if(mapper[num] != undefined) {
+                mapper[num].end();
+            }
+            return;
+        }else if(cmd == "PTCTN") {
+            if(mapper[num] != undefined) {
+                mapper[num].resume();
+            }
+            return;
+        }else if(cmd == "PTSTP") {
+            if(mapper[num] != undefined) {
+                mapper[num].pause();
+            }
+            return;
+        }else if(cmd == "COPEN") {
+            new_outgoing();
+            return;
+        }
+
+    }
+    
+    if(mapper[num] != undefined) {
+        if(mapper[num].write(real_data) == false) {
+            send_data(Buffer.from("PTSTP", num));
+        }
+    }
+
+});
+
+function new_outgoing() {
+    let conn = createConnection({host: target_host, port: target_port, allowHalfOpen: true}, () => {
+        send_data(Buffer.from("PTCTN", num));
+    }).on("end", () => {
+        send_data(Buffer.from("SHALF"), num);
+    }).on("data", (data) => {
+        print_allow_write(clients);
+        if(send_data(data, num) == false) {
+            conn.pause();
+            console.log(num, "tunnel塞住了,推不出去");
+        }
+    }).on("close", () => {
+        send_data(Buffer.from("PTCLS", num));
+        if(mapper[num] != undefined) {
+            mapper[num].destroy();
+            mapper[num] = undefined;
+        }
+    })
+    .on("error", (e) => {
+        console.log(e);
+    })
+    .on("drain", () => {
+        send_data(Buffer.from("PTCTN"), num);
+    }).setKeepAlive(true, 200);
+
+    mapper[num] = conn;
+    send_data(Buffer.from("PTCTN"), num);
+
+}
 
 function init_server() {
     let connected_count = 0;
@@ -33,71 +102,6 @@ function init_server() {
                 return;
             }
 
-            let lkdata = handleData((data) => {
-                let num = data.readUInt16LE(0);
-                let real_data = data.slice(2);
-                if(real_data.length == 5) {
-                    let cmd = real_data.toString();
-                    if(cmd == "PTCLS") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].destroy();
-                            mapper[num] = undefined;
-                        }
-                        return;
-                    }else if(cmd == "CHALF") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].end();
-                        }
-                        return;
-                    }else if(cmd == "PTCTN") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].resume();
-                        }
-                        return;
-                    }else if(cmd == "PTSTP") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].pause();
-                        }
-                        return;
-                    }else if(cmd == "COPEN") {
-                        let conn = createConnection({host: target_host, port: target_port}, () => {
-                            send_data(Buffer.from("PTCTN", num));
-                        }).on("end", () => {
-                            send_data(Buffer.from("SHALF"), num);
-                        }).on("data", (data) => {
-                            print_allow_write(clients);
-                            if(send_data(data, num) == false) {
-                                conn.pause();
-                                console.log(num, "tunnel塞住了,推不出去");
-                            }
-                        }).on("close", () => {
-                            send_data(Buffer.from("PTCLS", num));
-                            if(mapper[num] != undefined) {
-                                mapper[num].destroy();
-                                mapper[num] = undefined;
-                            }
-                        })
-                        .on("error", (e) => {
-                            console.log(e);
-                        })
-                        .on("drain", () => {
-                            send_data(Buffer.from("PTCTN"), num);
-                        }).setKeepAlive(true, 200);
-
-                        mapper[num] = conn;
-                        send_data(Buffer.from("PTCTN"), num);
-                        return;
-                    }
-
-                }
-                
-                if(mapper[num] != undefined) {
-                    if(mapper[num].write(real_data) == false) {
-                        send_data(Buffer.from("PTSTP", num));
-                    }
-                }
-
-            });
 
             socket.on("error", (e) => {
                 console.log(e);
