@@ -42,8 +42,8 @@ function init_server() {
             }).on("data", (data) => {
                 let num = data.readUInt16LE(0);
                 let real_data = data.slice(2);
-                console.log(num, real_data);
                 if(real_data.length == 5) {
+                    console.log(num, real_data);
                     let cmd = data.toString();
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
