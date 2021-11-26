@@ -101,6 +101,7 @@ function init_server() {
                         data: real_data,
                         next: (pkt_num + 1) == 128 ? 0: pkt_num + 1
                     }
+                    console.log(mapper[num].recv_handle[pkt_num]);
 
                     let k = true;
                     while(true) {

@@ -135,10 +135,10 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort, -1);
         }).on("data", (data) => {
-            let cur = mapper[num].send_count;
-            mapper[num].send_count ++;
-            if(mapper[num].send_count == 128) {
-                mapper[num].send_count = 0;
+            let cur = mapper[referPort].send_count;
+            mapper[referPort].send_count ++;
+            if(mapper[referPort].send_count == 128) {
+                mapper[referPort].send_count = 0;
             }
             if(send_data(data, referPort, cur) == false) {
                 socket.pause();
