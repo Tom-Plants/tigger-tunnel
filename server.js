@@ -52,7 +52,7 @@ let lkdata = handleData((data) => {
     
     if(mapper[num] != undefined) {
         if(mapper[num].write(real_data) == false) {
-            send_data(Buffer.from("PTSTP", num));
+            send_data(Buffer.from("PTSTP"), num);
         }
     }
 
@@ -60,7 +60,7 @@ let lkdata = handleData((data) => {
 
 function new_outgoing(num) {
     let conn = createConnection({host: target_host, port: target_port, allowHalfOpen: true}, () => {
-        send_data(Buffer.from("PTCTN", num));
+        send_data(Buffer.from("PTCTN"), num);
     }).on("end", () => {
         send_data(Buffer.from("SHALF"), num);
     }).on("data", (data) => {
