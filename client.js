@@ -61,8 +61,10 @@ function init_clients() {
 
                 }
                 
-                if(mapper[num].write(real_data) == false) {
-                    send_data(Buffer.from("PTSTP", num));
+                if(mapper[num] != undefined) {
+                    if(mapper[num].write(real_data) == false) {
+                        send_data(Buffer.from("PTSTP", num));
+                    }
                 }
 
             });

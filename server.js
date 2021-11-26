@@ -36,8 +36,8 @@ function init_server() {
                     let cmd = real_data.toString();
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
-                            mapper[num] = undefined;
                             mapper[num].destroy();
+                            mapper[num] = undefined;
                         }
                         return;
                     }else if(cmd == "CHALF") {
