@@ -33,7 +33,7 @@ function init_clients() {
         for(let i = 0; i < tunnel_num; i++) {
 
             let lkdata = handleData((data) => {
-                let pkt_num = data.readInt16(0);
+                let pkt_num = data.readInt16LE(0);
                 let num = data.readUInt16LE(2);
                 let real_data = data.slice(4);
                 if(real_data.length == 5 && pkt_num == -1) {
