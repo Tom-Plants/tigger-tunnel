@@ -35,6 +35,7 @@ function new_outgoing(num) {
         send_data(Buffer.from("SHALF"), num, -1);
     }).on("data", (data) => {
         let cur = mapper[num].sh();
+        console.log(num, cur, data);
         if(send_data(data, num, cur) == false) {
             conn.pause();
             // console.log(num, "tunnel塞住了,推不出去");
@@ -136,6 +137,7 @@ function init_server() {
 }
 
 function data_recive(data, referPort) {
+    console.log(referPort, data);
     if(mapper[referPort] != undefined) {
         if(mapper[referPort].s.write(data) == false) {
             send_data(Buffer.from("PTSTP"), referPort, -1);
@@ -144,7 +146,6 @@ function data_recive(data, referPort) {
 }
 
 function send_data(data, referPort, current_packet_num) {
-    print_allow_write(clients);
     if(referPort == undefined) throw "!";
     return sd(data, referPort, clients, tunnel_num, current_packet_num);
 }
