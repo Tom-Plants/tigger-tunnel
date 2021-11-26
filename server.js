@@ -85,6 +85,7 @@ function init_server() {
 
                         mapper[num] = conn;
                         send_data(Buffer.from("PTCTN"), num);
+                        console.log("PTCTN to ", num);
                         return;
                     }
 
