@@ -102,6 +102,7 @@ function init_server() {
                 console.log("tunnel has down");
             }).on("drain", () => {
                 socket._paused = false;
+                console.log("有tunnel空闲了!");
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].resume();
                 }

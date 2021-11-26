@@ -74,13 +74,13 @@ function init_clients() {
                 .on("error", (e) => {
                     console.log(e);
                 }).on("close", () => {
-                    console.log("num", ":", index, "has disconnected");
+                    console.log("num", ":", i, "has disconnected");
                     --connected_count;
                 }).on("drain", () => {
-                    console.log("num", ":", index, "has drained");
+                    console.log("num", ":", i, "has drained");
                     value._paused = false;
-                    for(let i in mapper) {
-                        if(mapper[i] != undefined) mapper[i].resume();
+                    for(let j in mapper) {
+                        if(mapper[j] != undefined) mapper[j].resume();
                     }
                 }).on("data", (data) => {
                     lkdata(data);
