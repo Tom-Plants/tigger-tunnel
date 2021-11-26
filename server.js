@@ -105,7 +105,7 @@ function init_server() {
                     let k = true;
                     while(true) {
                         if(mapper[num].current_needed == pkt_num) {
-                            console.log(mapper[num].recv_handle[pkt_num]);
+                            console.log(mapper[num].current_needed, pkt_num, mapper[num].recv_handle[pkt_num]);
                             if(mapper[num].s.write(mapper[num].recv_handle[pkt_num].data) == false) {
                                 if(k) {
                                     send_data(Buffer.from("PTSTP"), num, -1);
