@@ -13,6 +13,7 @@ function pk_handle(callback, referPort) {
                 }
                 if(buffer[recv_count] != undefined) {
                     cb(buffer[recv_count], rp, recv_count);
+                    buffer[recv_count] = undefined;
                 }else break;
             }
         }else {
