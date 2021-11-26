@@ -1,6 +1,5 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
-const {randomInt} = require("crypto");
 const {handleData, print_allow_write} = require("./common");
 const sd = require("./common").send_data;
 

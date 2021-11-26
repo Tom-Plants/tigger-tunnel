@@ -1,3 +1,5 @@
+const {randomInt} = require("crypto");
+
 /**
  * 处理粘包分包
  * @param data 处理粘包分包
