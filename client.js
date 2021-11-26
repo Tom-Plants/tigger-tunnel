@@ -130,6 +130,7 @@ function init_local_server() {
 }
 
 function send_data(data, referPort) {
+    if(referPort == undefined) throw "!";
     console.log(">>>", referPort, data);
     sd(data, referPort, clients);
 }
