@@ -64,6 +64,7 @@ function init_server() {
                         }).on("data", (data) => {
                             if(send_data(data, num) == false) {
                                 conn.pause();
+                                console.log(referPort, "tunnel塞住了,推不出去");
                             }
                         }).on("close", () => {
                             send_data(Buffer.from("PTCLS", num));
@@ -127,7 +128,6 @@ function send_data(data, referPort) {
             if(!send_block) {
                 //发送后阻塞
                 i._paused = true;
-                console.log(referPort, "tunnel塞住了,推不出去");
             }else {
                 i._paused = false;
             }
