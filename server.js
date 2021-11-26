@@ -43,6 +43,8 @@ function new_outgoing(num) {
         send_data(Buffer.from("PTCLS"), num, -1);
         if(mapper[num] != undefined) {
             mapper[num].s.destroy();
+            mapper[num].rh = undefined;
+            mapper[num].sh = undefined;
             mapper[num] = undefined;
         }
     })
@@ -79,6 +81,8 @@ function init_server() {
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
                             mapper[num].s.destroy();
+                            mapper[num].rh = undefined;
+                            mapper[num].sh = undefined;
                             mapper[num] = undefined;
                         }
                         return;
@@ -105,6 +109,7 @@ function init_server() {
                 }
                 
                 if(mapper[num] != undefined) {
+                    console.log(num, mapper[num]);
                     if(mapper[num].write(real_data) == false) {
                         send_data(Buffer.from("PTSTP"), num, -1);
                     }
