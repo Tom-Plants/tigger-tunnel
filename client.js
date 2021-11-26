@@ -26,7 +26,7 @@ function clear_clients() {
 let lkdata = handleData((data) => {
     let num = data.readUInt16LE(0);
     let real_data = data.slice(2);
-
+    console.log("<<<", num, real_data);
     if(real_data.length == 5) {
         let cmd = real_data.toString();
         if(cmd == "PTCLS") {
@@ -115,7 +115,7 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
-            print_allow_write(clients);
+            console.log(">>>", referPort, data);
             if(send_data(data, referPort) == false) {
                 socket.pause();
                 console.log(referPort, "tunnel塞住了,推不出去");
