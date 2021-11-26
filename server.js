@@ -119,7 +119,6 @@ function send_data(data, referPort) {
     let send_buffer = Buffer.concat([num_buffer, data]);
 
     for(let i of clients) {
-        console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
 
