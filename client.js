@@ -107,7 +107,7 @@ function send_data(data, referPort) {
 function init_local_server() {
     return createServer({
         allowHalfOpen: true,
-        pauseOnConnect: false
+        pauseOnConnect: true
     }, (socket) => {
         let referPort = socket.remotePort;
         if(referPort == undefined || allow_data_transfer == false) {
@@ -123,7 +123,7 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
-            console.log(data, referPort);
+            console.log(referPort, data);
             if(send_data(data, referPort) == false) {
                 socket.pause();
             }

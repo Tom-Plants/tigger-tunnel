@@ -84,6 +84,7 @@ function init_server() {
                         }).setKeepAlive(true, 200);
 
                         mapper[num] = conn;
+                        send_data(Buffer.from("PTCTN"), num);
                         return;
                     }
 
