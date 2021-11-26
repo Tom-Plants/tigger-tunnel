@@ -31,8 +31,8 @@ let lkdata = handleData((data) => {
         let cmd = real_data.toString();
         if(cmd == "PTCLS") {
             if(mapper[num] != undefined) {
-                mapper[num] = undefined;
                 mapper[num].destroy();
+                mapper[num] = undefined;
             }
             return;
         }else if(cmd == "SHALF") {
@@ -132,5 +132,5 @@ function init_local_server() {
 function send_data(data, referPort) {
     if(referPort == undefined) throw "!";
     console.log(">>>", referPort, data);
-    sd(data, referPort, clients);
+    sd(data, referPort, clients, tunnel_num);
 }

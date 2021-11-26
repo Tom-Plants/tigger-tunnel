@@ -52,7 +52,7 @@ function print_allow_write(clients) {
     console.log("可写管道：", count);
 }
 
-function send_data(data, referPort, clients) {
+function send_data(data, referPort, clients, tunnel_num) {
     let num_buffer = Buffer.allocUnsafe(6);
     num_buffer.writeUInt32LE(data.length + 2, 0);
     num_buffer.writeUInt16LE(referPort, 4);
