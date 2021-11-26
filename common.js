@@ -49,7 +49,7 @@ function handleData(callback) {
 function print_allow_write(clients) {
     let count = 0;
     for(let i of clients) {
-        //if(i._paused == false) count++;
+        if(i._paused == false) count++;
     }
     console.log("可写管道：", count);
 }

@@ -53,7 +53,7 @@ function init_clients() {
                         return;
                     }else if(cmd == "PTSTP") {
                         if(mapper[num] != undefined) {
-                            //mapper[num].pause();
+                            mapper[num].pause();
                         }
                         return;
                     }
@@ -82,7 +82,7 @@ function init_clients() {
                 --connected_count;
             }).on("drain", () => {
                 console.log("num", ":", i, "has drained");
-                //client._paused = false;
+                client._paused = false;
                 for(let j in mapper) {
                     if(mapper[j] != undefined) mapper[j].resume();
                 }
@@ -90,7 +90,7 @@ function init_clients() {
                 lkdata(data);
             });
 
-            //client._paused = false;
+            client._paused = false;
 
             clients.push(client);
         }
@@ -117,7 +117,7 @@ function init_local_server() {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
             if(send_data(data, referPort) == false) {
-                //socket.pause();
+                socket.pause();
                 //console.log(referPort, "tunnel塞住了,推不出去");
             }
         }).on("error", () => {})

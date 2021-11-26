@@ -23,7 +23,7 @@ function new_outgoing(num) {
         send_data(Buffer.from("SHALF"), num);
     }).on("data", (data) => {
         if(send_data(data, num) == false) {
-            //conn.pause();
+            conn.pause();
             console.log(num, "tunnel塞住了,推不出去");
         }
     }).on("close", () => {
@@ -73,7 +73,7 @@ function init_server() {
                         return;
                     }else if(cmd == "PTSTP") {
                         if(mapper[num] != undefined) {
-                            //mapper[num].pause();
+                            mapper[num].pause();
                         }
                         return;
                     }else if(cmd == "COPEN") {
@@ -90,7 +90,7 @@ function init_server() {
                 }
 
             });
-            // socket._paused = false;
+            socket._paused = false;
             ++connected_count;
             if(connected_count == tunnel_num) {
                 console.log("ALL tunnel has successfull connected !");
@@ -107,7 +107,7 @@ function init_server() {
                 --connected_count;
                 console.log("tunnel has down");
             }).on("drain", () => {
-                // socket._paused = false;
+                socket._paused = false;
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].resume();
                 }
