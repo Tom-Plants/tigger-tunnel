@@ -69,7 +69,7 @@ function new_outgoing(num) {
             console.log(num, "tunnel塞住了,推不出去");
         }
     }).on("close", () => {
-        send_data(Buffer.from("PTCLS", num));
+        send_data(Buffer.from("PTCLS"), num);
         if(mapper[num] != undefined) {
             mapper[num].destroy();
             mapper[num] = undefined;
