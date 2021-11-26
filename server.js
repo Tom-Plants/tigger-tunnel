@@ -54,9 +54,6 @@ function new_outgoing(num) {
     .on("drain", () => {
         send_data(Buffer.from("PTCTN"), num, -1);
     }).setKeepAlive(true, 200);
-
-    send_data(Buffer.from("PTCTN"), num, -1);
-
 }
 
 
