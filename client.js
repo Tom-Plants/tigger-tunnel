@@ -80,7 +80,7 @@ function init_clients() {
                 --connected_count;
             }).on("drain", () => {
                 console.log("num", ":", i, "has drained");
-                client._paused = false;
+                //client._paused = false;
                 for(let j in mapper) {
                     if(mapper[j] != undefined) mapper[j].resume();
                 }
@@ -88,7 +88,7 @@ function init_clients() {
                 lkdata(data);
             });
 
-            client._paused = false;
+            //client._paused = false;
 
             clients.push(client);
         }

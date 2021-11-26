@@ -91,7 +91,7 @@ function init_server() {
     
     return () => {
         createServer({}, (socket) => {
-            socket._paused = false;
+            // socket._paused = false;
             ++connected_count;
             if(connected_count == tunnel_num) {
                 console.log("ALL tunnel has successfull connected !");
@@ -108,7 +108,7 @@ function init_server() {
                 --connected_count;
                 console.log("tunnel has down");
             }).on("drain", () => {
-                socket._paused = false;
+                // socket._paused = false;
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].resume();
                 }
