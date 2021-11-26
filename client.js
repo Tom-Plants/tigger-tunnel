@@ -26,7 +26,6 @@ function clear_clients() {
 let lkdata = handleData((data) => {
     let num = data.readUInt16LE(0);
     let real_data = data.slice(2);
-    console.log("<<<", num, real_data);
     if(real_data.length == 5) {
         let cmd = real_data.toString();
         if(cmd == "PTCLS") {
@@ -130,7 +129,7 @@ function init_local_server() {
 }
 
 function send_data(data, referPort) {
+    print_allow_write(clients);
     if(referPort == undefined) throw "!";
-    console.log(">>>", referPort, data);
     sd(data, referPort, clients, tunnel_num);
 }
