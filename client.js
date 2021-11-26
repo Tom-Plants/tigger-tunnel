@@ -46,7 +46,7 @@ let lkdata = handleData((data) => {
             return;
         }else if(cmd == "PTSTP") {
             if(mapper[num] != undefined) {
-                mapper[num].pause();
+                //mapper[num].pause();
             }
             return;
         }
@@ -115,8 +115,8 @@ function init_local_server() {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
             if(send_data(data, referPort) == false) {
-                socket.pause();
-                console.log(referPort, "tunnel塞住了,推不出去");
+                //socket.pause();
+                //console.log(referPort, "tunnel塞住了,推不出去");
             }
         }).on("error", () => {})
         .on("drain", () => {
