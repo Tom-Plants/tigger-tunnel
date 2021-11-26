@@ -72,6 +72,9 @@ function init_server() {
                         }).on("end", () => {
                             send_data(Buffer.from("SHALF"), num);
                         }).on("data", (data) => {
+                            if(send_data(data, num) == false) {
+                                conn.pause();
+                            }
                         }).on("close", () => {
                             send_data(Buffer.from("PTCLS", num));
                             if(mapper[num] != undefined) {
