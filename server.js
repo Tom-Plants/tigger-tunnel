@@ -104,6 +104,7 @@ function init_server() {
 }
 function send_data(data, referPort) {
     for(let i of clients) {
+        console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
             let num_buffer = Buffer.allocUnsafe(2).writeUInt16LE(referPort);
