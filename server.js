@@ -1,5 +1,6 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
+const {randomInt} = require("crypto");
 
 const   tunnel_num = 8;                 //通道数
 const   target_port = 444;             //服务器端口
@@ -112,14 +113,17 @@ function init_server() {
     }
 }
 function send_data(data, referPort) {
+    let num_buffer = Buffer.allocUnsafe(6);
+    num_buffer.writeUInt32LE(data.length + 2, 0);
+    num_buffer.writeUInt16LE(referPort, 4);
+    let send_buffer = Buffer.concat([num_buffer, data]);
+
     for(let i of clients) {
+        console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
-            let num_buffer = Buffer.allocUnsafe(6);
-            num_buffer.writeUInt32LE(data.length + 2, 0);
-            num_buffer.writeUInt16LE(referPort, 4);
 
-            let send_block = i.write(Buffer.concat([num_buffer, data]));
+            let send_block = i.write(send_buffer);
 
             if(!send_block) {
                 //发送后阻塞
@@ -130,6 +134,10 @@ function send_data(data, referPort) {
             return send_block;
         }
     }
+    //随便选一个通道发出去
+    let index = randomInt(tunnel_num);
+    clients[index].write(send_buffer);
+    return false;
 }
 
 /**

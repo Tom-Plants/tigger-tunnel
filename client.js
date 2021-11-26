@@ -32,8 +32,6 @@ function init_clients() {
                 let num = data.readUInt16LE(0);
                 let real_data = data.slice(2);
 
-                console.log(num, real_data);
-
                 if(real_data.length == 5) {
                     let cmd = real_data.toString();
                     if(cmd == "PTCLS") {
@@ -93,14 +91,17 @@ function init_clients() {
     };
 }
 function send_data(data, referPort) {
+    let num_buffer = Buffer.allocUnsafe(6);
+    num_buffer.writeUInt32LE(data.length + 2, 0);
+    num_buffer.writeUInt16LE(referPort, 4);
+    let send_buffer = Buffer.concat([num_buffer, data]);
+
     for(let i of clients) {
+        console.log(i._paused);
         if(i._paused == false || i._paused == undefined) {
             //表明没有阻塞，那么发送数据
-            let num_buffer = Buffer.allocUnsafe(6);
-            num_buffer.writeUInt32LE(data.length + 2, 0);
-            num_buffer.writeUInt16LE(referPort, 4);
 
-            let send_block = i.write(Buffer.concat([num_buffer, data]));
+            let send_block = i.write(send_buffer);
 
             if(!send_block) {
                 //发送后阻塞
@@ -111,6 +112,10 @@ function send_data(data, referPort) {
             return send_block;
         }
     }
+    //随便选一个通道发出去
+    let index = randomInt(tunnel_num);
+    clients[index].write(send_buffer);
+    return false;
 }
 function init_local_server() {
     return createServer({
@@ -131,7 +136,6 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort);
         }).on("data", (data) => {
-            console.log(referPort, data);
             if(send_data(data, referPort) == false) {
                 socket.pause();
             }
