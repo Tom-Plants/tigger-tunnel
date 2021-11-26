@@ -100,8 +100,8 @@ function init_server() {
                 console.log("tunnel has down");
             }).on("drain", () => {
                 socket._paused = false;
-                for(let i of mapper) {
-                    i.resume();
+                for(let i in mapper) {
+                    mapper[i].resume();
                 }
             }).on("data", (data) => {
                 lkdata(data);
