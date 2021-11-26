@@ -149,7 +149,7 @@ function data_recive(data, referPort) {
 }
 
 function send_data(data, referPort, current_packet_num) {
-    print_allow_write(clients);
+    console.log(referPort, current_packet_num, data);
     if(referPort == undefined) throw "!";
     sd(data, referPort, clients, tunnel_num, current_packet_num);
 }
