@@ -99,7 +99,7 @@ function init_server() {
                 --connected_count;
                 console.log("tunnel has down");
             }).on("drain", () => {
-                value._paused = false;
+                socket._paused = false;
                 for(let i of mapper) {
                     i.resume();
                 }
