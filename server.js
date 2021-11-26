@@ -64,7 +64,7 @@ function new_outgoing(num) {
     }).on("end", () => {
         send_data(Buffer.from("SHALF"), num);
     }).on("data", (data) => {
-        console.log(">>>", referPort, data);
+        console.log(">>>", num, data);
         if(send_data(data, num) == false) {
             conn.pause();
             console.log(num, "tunnel塞住了,推不出去");
