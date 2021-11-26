@@ -79,8 +79,7 @@ function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
     }
     //随便选一个通道发出去
     console.log("随便选了个通道发送了");
-    let index = randomInt(tunnel_num);
-    clients[index].write(send_buffer);
+    clients[0].write(send_buffer);
     return false;
 }
 
