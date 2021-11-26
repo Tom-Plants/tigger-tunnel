@@ -18,18 +18,23 @@ init_server()();
 
 function new_outgoing(num) {
     let conn = createConnection({host: target_host, port: target_port, allowHalfOpen: true}, () => {
-        send_data(Buffer.from("PTCTN"), num);
+        send_data(Buffer.from("PTCTN"), num, -1);
     }).on("end", () => {
-        send_data(Buffer.from("SHALF"), num);
+        send_data(Buffer.from("SHALF"), num, -1);
     }).on("data", (data) => {
-        if(send_data(data, num) == false) {
+        let cur = mapper[num].send_count;
+        mapper[num].send_count ++;
+        if(mapper[num].send_count == 128) {
+            mapper[num].send_count = 0;
+        }
+        if(send_data(data, num, cur) == false) {
             conn.pause();
-            console.log(num, "tunnel塞住了,推不出去");
+            // console.log(num, "tunnel塞住了,推不出去");
         }
     }).on("close", () => {
-        send_data(Buffer.from("PTCLS"), num);
+        send_data(Buffer.from("PTCLS"), num, -1);
         if(mapper[num] != undefined) {
-            mapper[num].destroy();
+            mapper[num].s.destroy();
             mapper[num] = undefined;
         }
     })
@@ -37,11 +42,16 @@ function new_outgoing(num) {
         console.log(e);
     })
     .on("drain", () => {
-        send_data(Buffer.from("PTCTN"), num);
+        send_data(Buffer.from("PTCTN"), num, -1);
     }).setKeepAlive(true, 200);
 
-    mapper[num] = conn;
-    send_data(Buffer.from("PTCTN"), num);
+    mapper[num] = {
+        s:conn,
+        recv_handle: {},
+        current_needed: 0,
+        send_count: 0
+    };
+    send_data(Buffer.from("PTCTN"), num, -1);
 
 }
 
@@ -51,29 +61,30 @@ function init_server() {
     return () => {
         createServer({}, (socket) => {
             let lkdata = handleData((data) => {
-                let num = data.readUInt16LE(0);
-                let real_data = data.slice(2);
-                if(real_data.length == 5) {
+                let pkt_num = data.readInt8(0);
+                let num = data.readUInt16LE(1);
+                let real_data = data.slice(3);
+                if(real_data.length == 5 && pkt_num == -1) {
                     let cmd = real_data.toString();
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
-                            mapper[num].destroy();
+                            mapper[num].s.destroy();
                             mapper[num] = undefined;
                         }
                         return;
                     }else if(cmd == "CHALF") {
                         if(mapper[num] != undefined) {
-                            mapper[num].end();
+                            mapper[num].s.end();
                         }
                         return;
                     }else if(cmd == "PTCTN") {
                         if(mapper[num] != undefined) {
-                            mapper[num].resume();
+                            mapper[num].s.resume();
                         }
                         return;
                     }else if(cmd == "PTSTP") {
                         if(mapper[num] != undefined) {
-                            mapper[num].pause();
+                            mapper[num].s.pause();
                         }
                         return;
                     }else if(cmd == "COPEN") {
@@ -84,8 +95,27 @@ function init_server() {
                 }
                 
                 if(mapper[num] != undefined) {
-                    if(mapper[num].write(real_data) == false) {
-                        send_data(Buffer.from("PTSTP"), num);
+
+                    mapper[num].recv_handle[pkt_num] = {
+                        data: real_data,
+                        next: (pkt_num + 1) == 128 ? 0: pkt_num + 1
+                    }
+
+                    let k = true;
+                    while(true) {
+                        if(mapper[num].current_needed == pkt_num) {
+                            if(mapper[num].s.write(mapper[num].recv_handle[pkt_num].data) == false) {
+                                if(k) {
+                                    send_data(Buffer.from("PTSTP"), num, -1);
+                                    k = false;
+                                }
+                            }
+                            mapper[num].current_needed ++;
+                            if(mapper[num].current_needed == 128) {
+                                mapper[num].current_needed = 0;
+                            }
+                            pkt_num = mapper[num].recv_handle[pkt_num].next;
+                        }else {break;}
                     }
                 }
 
@@ -109,7 +139,7 @@ function init_server() {
             }).on("drain", () => {
                 socket._paused = false;
                 for(let i in mapper) {
-                    if(mapper[i] != undefined) mapper[i].resume();
+                    if(mapper[i] != undefined) mapper[i].s.resume();
                 }
             }).on("data", (data) => {
                 lkdata(data);
@@ -120,8 +150,8 @@ function init_server() {
     }
 }
 
-function send_data(data, referPort) {
+function send_data(data, referPort, current_packet_num) {
     print_allow_write(clients);
     if(referPort == undefined) throw "!";
-    sd(data, referPort, clients, tunnel_num);
+    sd(data, referPort, clients, tunnel_num, current_packet_num);
 }

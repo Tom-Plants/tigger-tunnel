@@ -31,29 +31,30 @@ function init_clients() {
         for(let i = 0; i < tunnel_num; i++) {
 
             let lkdata = handleData((data) => {
-                let num = data.readUInt16LE(0);
-                let real_data = data.slice(2);
-                if(real_data.length == 5) {
+                let pkt_num = data.readInt8(0);
+                let num = data.readUInt16LE(1);
+                let real_data = data.slice(3);
+                if(real_data.length == 5 && pkt_num == -1) {
                     let cmd = real_data.toString();
                     if(cmd == "PTCLS") {
                         if(mapper[num] != undefined) {
-                            mapper[num].destroy();
+                            mapper[num].s.destroy();
                             mapper[num] = undefined;
                         }
                         return;
                     }else if(cmd == "SHALF") {
                         if(mapper[num] != undefined) {
-                            mapper[num].end();
+                            mapper[num].s.end();
                         }
                         return;
                     }else if(cmd == "PTCTN") {
                         if(mapper[num] != undefined) {
-                            mapper[num].resume();
+                            mapper[num].s.resume();
                         }
                         return;
                     }else if(cmd == "PTSTP") {
                         if(mapper[num] != undefined) {
-                            mapper[num].pause();
+                            mapper[num].s.pause();
                         }
                         return;
                     }
@@ -61,8 +62,26 @@ function init_clients() {
                 }
                 
                 if(mapper[num] != undefined) {
-                    if(mapper[num].write(real_data) == false) {
-                        send_data(Buffer.from("PTSTP"), num);
+                    mapper[num].recv_handle[pkt_num] = {
+                        data: real_data,
+                        next: (pkt_num + 1) == 128 ? 0: pkt_num + 1
+                    }
+
+                    let k = true;
+                    while(true) {
+                        if(mapper[num].current_needed == pkt_num) {
+                            if(mapper[num].s.write(mapper[num].recv_handle[pkt_num].data) == false) {
+                                if(k) {
+                                    send_data(Buffer.from("PTSTP"), num, -1);
+                                    k = false;
+                                }
+                            }
+                            mapper[num].current_needed ++;
+                            if(mapper[num].current_needed == 128) {
+                                mapper[num].current_needed = 0;
+                            }
+                            pkt_num = mapper[num].recv_handle[pkt_num].next;
+                        }else {break;}
                     }
                 }
 
@@ -84,7 +103,7 @@ function init_clients() {
                 console.log("num", ":", i, "has drained");
                 client._paused = false;
                 for(let j in mapper) {
-                    if(mapper[j] != undefined) mapper[j].resume();
+                    if(mapper[j] != undefined) mapper[j].s.resume();
                 }
             }).on("data", (data) => {
                 lkdata(data);
@@ -108,30 +127,40 @@ function init_local_server() {
             return;
         }
         socket.on("close", () => {
-            send_data(Buffer.from("PTCLS"), referPort);
+            send_data(Buffer.from("PTCLS"), referPort, -1);
             if(mapper[referPort] != undefined){
-                mapper[referPort].destroy();
+                mapper[referPort].s.destroy();
                 mapper[referPort] = undefined;
             }
         }).on("end", () => {
-            send_data(Buffer.from("CHALF"), referPort);
+            send_data(Buffer.from("CHALF"), referPort, -1);
         }).on("data", (data) => {
-            if(send_data(data, referPort) == false) {
+            let cur = mapper[num].send_count;
+            mapper[num].send_count ++;
+            if(mapper[num].send_count == 128) {
+                mapper[num].send_count = 0;
+            }
+            if(send_data(data, referPort, cur) == false) {
                 socket.pause();
                 //console.log(referPort, "tunnel塞住了,推不出去");
             }
         }).on("error", () => {})
         .on("drain", () => {
-            send_data(Buffer.from("PTCTN"), referPort);
+            send_data(Buffer.from("PTCTN"), referPort, -1);
         }).setKeepAlive(true, 200);
 
-        mapper[referPort] = socket;
-        send_data(Buffer.from("COPEN"), referPort);
+        mapper[referPort] = {
+            s:socket,
+            recv_handle: {},
+            current_needed: 0,
+            send_count: 0
+        };
+        send_data(Buffer.from("COPEN"), referPort, -1);
     }).listen({port: local_port, host: local_host});
 }
 
-function send_data(data, referPort) {
+function send_data(data, referPort, current_packet_num) {
     print_allow_write(clients);
     if(referPort == undefined) throw "!";
-    sd(data, referPort, clients, tunnel_num);
+    sd(data, referPort, clients, tunnel_num, current_packet_num);
 }
