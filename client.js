@@ -1,5 +1,5 @@
 const Client = require('net').Socket;
-const {Server, createServer} = require('net');
+const {Server, createServer, createConnection} = require('net');
 
 const   tunnel_num = 8;                 //通道数
 const   target_port = 8080;             //服务器端口
@@ -25,9 +25,6 @@ function init_clients() {
     
     return () => {
         for(let i = 0; i < tunnel_num; i++) {
-            clients.push(new Client());
-        }
-        clients.map((value, index) => {
             let lkdata = handleData((data) => {
                 let num = data.readUInt16LE(0);
                 let real_data = data.slice(2);
@@ -66,28 +63,30 @@ function init_clients() {
                 }
 
             });
-            value.connect(target_port, target_host)
-            .on("connect", () => {
-                console.log(target_host, ":", target_port, "connect successfull");
-                if(++connected_count == tunnel_num) {
-                    console.log("ALL tunnel has successfull connected !");
-                    allow_data_transfer = true;
-                }
-            }).on("error", (e) => {
-                console.log(e);
-            }).on("close", () => {
-                console.log("num", ":", index, "has disconnected");
-                --connected_count;
-            }).on("drain", () => {
-                console.log("num", ":", index, "has drained");
-                value._paused = false;
-                for(let i in mapper) {
-                    if(mapper[i] != undefined) mapper[i].resume();
-                }
-            }).on("data", (data) => {
-                lkdata(data);
-            });
-        });
+            clients.push(
+                createConnection({host: target_host, port: target_port}, () => {
+                    console.log(target_host, ":", target_port, "connect successfull");
+                    if(++connected_count == tunnel_num) {
+                        console.log("ALL tunnel has successfull connected !");
+                        allow_data_transfer = true;
+                    }
+                })
+                .on("error", (e) => {
+                    console.log(e);
+                }).on("close", () => {
+                    console.log("num", ":", index, "has disconnected");
+                    --connected_count;
+                }).on("drain", () => {
+                    console.log("num", ":", index, "has drained");
+                    value._paused = false;
+                    for(let i in mapper) {
+                        if(mapper[i] != undefined) mapper[i].resume();
+                    }
+                }).on("data", (data) => {
+                    lkdata(data);
+                })
+            );
+        }
     };
 }
 function send_data(data, referPort) {
