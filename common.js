@@ -51,6 +51,7 @@ function print_allow_write(clients) {
     for(let i of clients) {
         if(i._paused == false) count++;
     }
+    console.log("可写管道：", count);
 }
 
 function send_data(data, referPort, clients, tunnel_num, current_packet_num) {

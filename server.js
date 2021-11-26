@@ -136,7 +136,6 @@ function init_server() {
 }
 
 function data_recive(data, referPort) {
-    console.log("<<", referPort, data);
     if(mapper[referPort] != undefined) {
         if(mapper[referPort].s.write(data) == false) {
             send_data(Buffer.from("PTSTP"), referPort, -1);
@@ -145,7 +144,6 @@ function data_recive(data, referPort) {
 }
 
 function send_data(data, referPort, current_packet_num) {
-    console.log(">>", referPort, current_packet_num, data);
     if(referPort == undefined) throw "!";
     sd(data, referPort, clients, tunnel_num, current_packet_num);
 }
