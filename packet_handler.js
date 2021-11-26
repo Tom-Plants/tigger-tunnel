@@ -8,7 +8,7 @@ function pk_handle(callback, referPort) {
             cb(data, rp, recv_count);
             while(true) {
                 recv_count ++;
-                if(recv_count == 128) {
+                if(recv_count == 32767) {
                     recv_count = 0
                 }
                 if(buffer[recv_count] != undefined) {
@@ -26,7 +26,7 @@ function pk_handle(callback, referPort) {
 function st_handle() {
     let send_count = 0;
     return () => {
-        if(send_count == 128) {
+        if(send_count == 32767) {
             send_count = 0;
         }
         return send_count++;

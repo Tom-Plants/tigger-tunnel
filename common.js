@@ -55,10 +55,10 @@ function print_allow_write(clients) {
 }
 
 function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
-    let num_buffer = Buffer.allocUnsafe(7);
-    num_buffer.writeUInt32LE(data.length + 3, 0);
-    num_buffer.writeInt8(current_packet_num, 4);
-    num_buffer.writeUInt16LE(referPort, 5);
+    let num_buffer = Buffer.allocUnsafe(8);
+    num_buffer.writeUInt32LE(data.length + 4, 0);
+    num_buffer.writeInt16(current_packet_num, 4);
+    num_buffer.writeUInt16LE(referPort, 6);
     let send_buffer = Buffer.concat([num_buffer, data]);
 
     for(let i of clients) {
