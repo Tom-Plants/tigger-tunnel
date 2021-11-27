@@ -36,34 +36,6 @@ function init_clients() {
                 let pkt_num = data.readInt16LE(0);
                 let num = data.readUInt16LE(2);
                 let real_data = data.slice(4);
-                if(real_data.length == 5 && pkt_num == -1) {
-                    let cmd = real_data.toString();
-                    if(cmd == "PTCLS") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].s.destroy();
-                            mapper[num].rh = undefined;
-                            mapper[num].sh = undefined;
-                            mapper[num] = undefined;
-                        }
-                        return;
-                    }else if(cmd == "SHALF") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].s.end();
-                        }
-                        return;
-                    }else if(cmd == "PTCTN") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].s.resume();
-                        }
-                        return;
-                    }else if(cmd == "PTSTP") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].s.pause();
-                        }
-                        return;
-                    }
-
-                }
                 
                 if(mapper[num] != undefined) {
                     mapper[num].rh(pkt_num, real_data);
@@ -114,7 +86,9 @@ function init_local_server() {
         mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort)};
 
         socket.on("close", () => {
-            send_data(Buffer.from("PTCLS"), referPort, -1);
+            if(mapper[referPort] == undefined) { return };
+            let cur = mapper[referPort].sh();
+            send_data(Buffer.from("PTCLS"), referPort, cur);
             if(mapper[referPort] != undefined){
                 mapper[referPort].s.destroy();
                 mapper[referPort].rh = undefined;
@@ -122,7 +96,9 @@ function init_local_server() {
                 mapper[referPort] = undefined;
             }
         }).on("end", () => {
-            send_data(Buffer.from("CHALF"), referPort, -1);
+            if(mapper[referPort] == undefined) { return };
+            let cur = mapper[referPort].sh();
+            send_data(Buffer.from("CHALF"), referPort, cur);
         }).on("data", (data) => {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
@@ -132,18 +108,41 @@ function init_local_server() {
             }
         }).on("error", () => {})
         .on("drain", () => {
-            send_data(Buffer.from("PTCTN"), referPort, -1);
+            if(mapper[referPort] == undefined) { return };
+            let cur = mapper[referPort].sh();
+            send_data(Buffer.from("PTCTN"), referPort, cur);
         }).setKeepAlive(true, 200);
 
-
-        send_data(Buffer.from("COPEN"), referPort, -1);
+        let cur = mapper[referPort].sh();
+        send_data(Buffer.from("COPEN"), referPort, cur);
     }).listen({port: local_port, host: local_host});
 }
 
 function data_recive(data, referPort, pkt) {
     if(mapper[referPort] != undefined) {
+        if(data.length == 5) {
+            let cmd = data.toString();
+            if(cmd == "PTCLS") {
+                mapper[referPort].s.destroy();
+                mapper[referPort].rh = undefined;
+                mapper[referPort].sh = undefined;
+                mapper[referPort] = undefined;
+                return;
+            }else if(cmd == "SHALF") {
+                mapper[referPort].s.end();
+                return;
+            }else if(cmd == "PTCTN") {
+                mapper[referPort].s.resume();
+                return;
+            }else if(cmd == "PTSTP") {
+                mapper[referPort].s.pause();
+                return;
+            }
+
+        }
         if(mapper[referPort].s.write(data) == false) {
-            send_data(Buffer.from("PTSTP"), referPort, -1);
+            let cur = mapper[referPort].sh();
+            send_data(Buffer.from("PTSTP"), referPort, cur);
         }
     }
 }
