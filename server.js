@@ -80,7 +80,7 @@ function init_server() {
                     let cmd = real_data.toString();
                     if(cmd == "COPEN") {
                         //这里会创建针对mapper[num]的对象
-                        new_outgoing(referPort);
+                        new_outgoing(num);
                         return;
                     }
                 }
@@ -139,9 +139,6 @@ function data_recive(data, referPort, pkt) {
                 return;
             }else if(cmd == "PTSTP") {
                 mapper[referPort].s.pause();
-                return;
-            }else if(cmd == "COPEN") {
-                new_outgoing(referPort);
                 return;
             }
         }
