@@ -124,7 +124,7 @@ function init_local_server() {
         }).on("end", () => {
             send_data(Buffer.from("CHALF"), referPort, -1);
         }).on("data", (data) => {
-            if(mapper[num] == undefined) {return};
+            if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
             if(send_data(data, referPort, cur) == false) {
                 socket.pause();
