@@ -119,6 +119,7 @@ function init_local_server() {
 }
 
 function data_recive(data, referPort, pkt) {
+    console.log("<<<", pkt, referPort, data);
     if(mapper[referPort] != undefined) {
         if(data.length == 5) {
             let cmd = data.toString();
@@ -148,6 +149,7 @@ function data_recive(data, referPort, pkt) {
 }
 
 function send_data(data, referPort, current_packet_num) {
+    console.log(">>>", current_packet_num, referPort, data);
     if(referPort == undefined) throw "!";
     return sd(data, referPort, clients, tunnel_num, current_packet_num);
 }
