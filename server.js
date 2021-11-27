@@ -76,7 +76,15 @@ function init_server() {
                 let num = data.readUInt16LE(2);
                 let real_data = data.slice(4);
 
-                console.log(mapper[num]);
+                if(real_data.length == 5) {
+                    let cmd = real_data.toString();
+                    if(cmd == "COPEN") {
+                        //这里会创建针对mapper[num]的对象
+                        new_outgoing(referPort);
+                        return;
+                    }
+                }
+
                 if(mapper[num] != undefined) {
                     mapper[num].rh(pkt_num, real_data);
                 }
