@@ -34,6 +34,7 @@ function new_outgoing(num) {
     conn.on("end", () => {
         send_data(Buffer.from("SHALF"), num, -1);
     }).on("data", (data) => {
+        if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
         if(send_data(data, num, cur) == false) {
             conn.pause();
