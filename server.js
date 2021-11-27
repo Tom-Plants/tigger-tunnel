@@ -75,6 +75,8 @@ function init_server() {
                 let pkt_num = data.readInt16LE(0);
                 let num = data.readUInt16LE(2);
                 let real_data = data.slice(4);
+
+                console.log(pkt_num, num, real_data);
                 
                 if(mapper[num] != undefined) {
                     mapper[num].rh(pkt_num, real_data);
