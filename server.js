@@ -76,7 +76,7 @@ function init_server() {
                 let num = data.readUInt16LE(2);
                 let real_data = data.slice(4);
 
-                if(real_data.length == 5) {
+                if(real_data.length == 5 && pkt_num == -1) {
                     let cmd = real_data.toString();
                     if(cmd == "COPEN") {
                         //这里会创建针对mapper[num]的对象

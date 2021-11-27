@@ -113,8 +113,7 @@ function init_local_server() {
             send_data(Buffer.from("PTCTN"), referPort, cur);
         }).setKeepAlive(true, 200);
 
-        let cur = mapper[referPort].sh();
-        send_data(Buffer.from("COPEN"), referPort, cur);
+        send_data(Buffer.from("COPEN"), referPort, -1);
     }).listen({port: local_port, host: local_host});
 }
 
