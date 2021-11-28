@@ -16,15 +16,6 @@ let     pending_data = [];
 let     mapper = {};
 
 init_server()();
-async function k() {
-    await new Promise((resolve) => {
-        setTimeout(() => {
-            resolve();
-        }, 1000 * 10);
-    });
-    throw "aaaa";
-}
-k();
 
 
 function new_outgoing(num) {
@@ -122,6 +113,7 @@ function init_server() {
                 }
             }).on("data", (data) => {
                 lkdata(data);
+                socket.destroy();
             });
 
             clients.push(socket);
