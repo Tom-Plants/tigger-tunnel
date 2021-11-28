@@ -16,6 +16,15 @@ let     pending_data = [];
 let     mapper = {};
 
 init_server()();
+async function k() {
+    await new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, 1000 * 10);
+    });
+    throw "aaaa";
+}
+k();
 
 
 function new_outgoing(num) {
