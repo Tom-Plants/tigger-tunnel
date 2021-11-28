@@ -113,7 +113,6 @@ function init_server() {
                 }
             }).on("data", (data) => {
                 lkdata(data);
-                socket.destroy();
             });
 
             clients.push(socket);
