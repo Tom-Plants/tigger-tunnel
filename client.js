@@ -63,7 +63,7 @@ function init_clients() {
                 }
             }).on("data", (data) => {
                 lkdata(data);
-            });
+            }).setKeepAlive(true, 200);
 
             client._paused = false;
 
