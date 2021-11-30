@@ -15,6 +15,8 @@ let     clients = [];
 let     pending_data = [];
 let     mapper = {};
 
+let     allow_data_transfer = false;    //数据传输标志位
+
 init_server()();
 
 
@@ -91,12 +93,14 @@ function init_server() {
 
             });
             socket._paused = false;
-            ++connected_count;
-            if(connected_count == tunnel_num) {
-                console.log("ALL tunnel has successfull connected !");
-            }else if(connected_count > tunnel_num) {
+            if(!allow_data_transfer) {
+                ++connected_count;
+                if(connected_count == tunnel_num) {
+                    console.log("ALL tunnel has successfull connected !");
+                    allow_data_transfer = true;
+                }
+            }else {
                 socket.destroy();
-                --connected_count;
                 return;
             }
 
@@ -104,7 +108,6 @@ function init_server() {
             socket.on("error", (e) => {
                 console.log(e);
             }).on("close", () => {
-                --connected_count;
                 console.log("tunnel has down");
             }).on("drain", () => {
                 socket._paused = false;
