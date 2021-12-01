@@ -1,7 +1,7 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
-const sd = require("./common").send_data;
+const sd = require("./common").send_data();
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 

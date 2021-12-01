@@ -1,5 +1,3 @@
-const {randomInt} = require("crypto");
-
 /**
  * 处理粘包分包
  * @param data 处理粘包分包
@@ -54,31 +52,22 @@ function print_allow_write(clients) {
     console.log("可写管道：", count);
 }
 
-function send_data(data, referPort, clients, tunnel_num, current_packet_num) {
-    let num_buffer = Buffer.allocUnsafe(8);
-    num_buffer.writeUInt32LE(data.length + 4, 0);
-    num_buffer.writeInt16LE(current_packet_num, 4);
-    num_buffer.writeUInt16LE(referPort, 6);
-    let send_buffer = Buffer.concat([num_buffer, data]);
+function send_data() {
+    let count = 0;
+    return (data, referPort, clients, tunnel_num, current_packet_num) => {
+        let num_buffer = Buffer.allocUnsafe(8);
+        num_buffer.writeUInt32LE(data.length + 4, 0);
+        num_buffer.writeInt16LE(current_packet_num, 4);
+        num_buffer.writeUInt16LE(referPort, 6);
+        let send_buffer = Buffer.concat([num_buffer, data]);
 
-    for(let i of clients) {
-        if(i._paused == false) {
-            //表明没有阻塞，那么发送数据
-
-            let send_block = i.write(send_buffer);
-
-            if(!send_block) {
-                //发送后阻塞
-                i._paused = true;
-            }else {
-                i._paused = false;
-            }
-
-            return send_block;
+        let _b = clients[count++].write(send_buffer);
+        if(count >= tunnel_num) {
+            count = 0;
         }
-    }
-    //随便选一个通道发出去
-    return clients[0].write(send_buffer);
+
+        return _b;
+    };
 }
 
 module.exports = {
