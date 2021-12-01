@@ -36,6 +36,19 @@ function init_clients() {
                 let pkt_num = data.readInt16LE(0);
                 let num = data.readUInt16LE(2);
                 let real_data = data.slice(4);
+
+                if(real_data.length == 5 && pkt_num == -1) {
+                    let cmd = real_data.toString();
+                    if(cmd == "PTCLS") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].s.destroy();
+                            mapper[num].rh = undefined;
+                            mapper[num].sh = undefined;
+                            mapper[num] = undefined;
+                        }
+                        return;
+                    }
+                }
                 
                 if(mapper[num] != undefined) {
                     mapper[num].rh(pkt_num, real_data);
@@ -78,7 +91,7 @@ function init_local_server() {
         pauseOnConnect: true
     }, (socket) => {
         let referPort = socket.remotePort;
-        if(referPort == undefined || allow_data_transfer == false) {
+        if(referPort == undefined || allow_data_transfer == false || mapper[referPort] != undefined) {
             socket.destroy();
             return;
         }
@@ -143,6 +156,8 @@ function data_recive(data, referPort, pkt) {
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("PTSTP"), referPort, cur);
         }
+    }else {
+        send_data(Buffer.from("PTCLS"), referPort, -1);
     }
 }
 

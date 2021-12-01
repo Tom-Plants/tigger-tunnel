@@ -82,7 +82,18 @@ function init_server() {
                     let cmd = real_data.toString();
                     if(cmd == "COPEN") {
                         //这里会创建针对mapper[num]的对象
+                        if(mapper[num] != undefined) {
+                            return;
+                        }
                         new_outgoing(num);
+                        return;
+                    }else if(cmd == "PTCLS") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].s.destroy();
+                            mapper[num].rh = undefined;
+                            mapper[num].sh = undefined;
+                            mapper[num] = undefined;
+                        }
                         return;
                     }
                 }
@@ -149,6 +160,8 @@ function data_recive(data, referPort, pkt) {
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("PTSTP"), referPort, cur);
         }
+    }else {
+        send_data(Buffer.from("PTCLS"), referPort, -1);
     }
 }
 
