@@ -65,6 +65,7 @@ function send_data() {
         if(count >= tunnel_num) {
             count = 0;
         }
+        console.log(count);
 
         return _b;
     };
