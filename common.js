@@ -60,13 +60,43 @@ function send_data() {
         num_buffer.writeUInt16LE(referPort, 6);
         let send_buffer = Buffer.concat([num_buffer, data]);
 
-        let _b = clients[count++].write(send_buffer);
-        if(count >= tunnel_num) {
-            count = 0;
+        let is_b = false;
+        if(clients[count]._paused == true) {
+            let id = get_noblock_tunnel(clients);
+            if(id != false) {
+                //成功
+                is_b = clients[id].write(send_buffer);
+                clients[id]._paused = !is_b;
+                count = id;
+            }else {
+                //失败
+                clients[count].write(send_buffer);
+                return false;
+            }
+        }else {
+            is_b = clients[count].write(send_buffer);
+            clients[count]._paused = !is_b;
+
+            count++;
+            if(count >= tunnel_num) {
+                count = 0;
+            }
         }
 
-        return _b;
+        return is_b;
     };
+}
+
+function get_noblock_tunnel(clients, tunnel_num) {
+    for(let i = 0; i < tunnel_num; i++)
+    {
+        if(clients[i]._paused == false)
+        {
+            return i;
+        }
+
+    }
+    return false;
 }
 
 module.exports = {
