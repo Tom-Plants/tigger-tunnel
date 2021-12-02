@@ -52,7 +52,6 @@ function print_allow_write(clients) {
 }
 
 function send_data() {
-    let count = 0;
     return (data, referPort, clients, tunnel_num, current_packet_num) => {
         let num_buffer = Buffer.allocUnsafe(8);
         num_buffer.writeUInt32LE(data.length + 4, 0);
@@ -60,29 +59,15 @@ function send_data() {
         num_buffer.writeUInt16LE(referPort, 6);
         let send_buffer = Buffer.concat([num_buffer, data]);
 
-        let is_b = false;
-        if(clients[count]._paused == true) {
-            let id = get_noblock_tunnel(clients);
-            if(id != false) {
-                //成功
-                is_b = clients[id].write(send_buffer);
-                clients[id]._paused = !is_b;
-                count = id;
-            }else {
-                //失败
-                clients[count].write(send_buffer);
-                return false;
-            }
-        }else {
-            is_b = clients[count].write(send_buffer);
-            clients[count]._paused = !is_b;
-
-            count++;
-            if(count >= tunnel_num) {
-                count = 0;
-            }
+        let id = get_noblock_tunnel(clients);
+        if(id == false) {
+            client[0].write(send_buffer);
+            return false;
         }
-
+        let is_b = clients[id].write(send_buffer);
+        if(!is_b) {
+            clients[id]._paused = true;
+        }
         return is_b;
     };
 }

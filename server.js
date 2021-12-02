@@ -43,7 +43,9 @@ function new_outgoing(num) {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
         if(send_data(data, num, cur) == false) {
-            conn.pause();
+            for(let i in mapper) {
+                if(mapper[i] != undefined) mapper[i].s.pause();
+            }
             // console.log(num, "tunnel塞住了,推不出去");
         }
     }).on("close", () => {

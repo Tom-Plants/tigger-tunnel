@@ -116,7 +116,9 @@ function init_local_server() {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
             if(send_data(data, referPort, cur) == false) {
-                socket.pause();
+                for(let i in mapper) {
+                    if(mapper[i] != undefined) mapper[i].s.pause();
+                }
                 //console.log(referPort, "tunnel塞住了,推不出去");
             }
         }).on("error", () => {})
