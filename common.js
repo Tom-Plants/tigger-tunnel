@@ -61,7 +61,7 @@ function send_data() {
 
         let id = get_noblock_tunnel(clients);
         if(id == false) {
-            client[0].write(send_buffer);
+            clients[0].write(send_buffer);
             return false;
         }
         let is_b = clients[id].write(send_buffer);
