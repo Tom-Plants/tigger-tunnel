@@ -61,7 +61,7 @@ function send_data() {
 
         let id = get_noblock_tunnel(clients, tunnel_num);
         console.log(id);
-        if(id == false) {
+        if(id == -1) {
             clients[0].write(send_buffer);
             return false;
         }
@@ -83,7 +83,7 @@ function get_noblock_tunnel(clients, tunnel_num) {
         }
 
     }
-    return false;
+    return -1;
 }
 
 module.exports = {
