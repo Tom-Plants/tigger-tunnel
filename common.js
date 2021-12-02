@@ -59,7 +59,7 @@ function send_data() {
         num_buffer.writeUInt16LE(referPort, 6);
         let send_buffer = Buffer.concat([num_buffer, data]);
 
-        let id = get_noblock_tunnel(clients);
+        let id = get_noblock_tunnel(clients, tunnel_num);
         if(id == false) {
             clients[0].write(send_buffer);
             return false;
