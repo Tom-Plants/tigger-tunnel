@@ -65,10 +65,10 @@ function send_data() {
             return false;
         }
         let is_b = clients[id].write(send_buffer);
+        console.log("aaa", is_b);
         if(!is_b) {
             clients[id]._paused = true;
         }
-        console.log(is_b);
         return is_b;
     };
 }
