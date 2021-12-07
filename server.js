@@ -50,7 +50,10 @@ function new_outgoing(num) {
         if(send_data(data, num, cur) == false) {
             tunnel_block = true;
             for(let i in mapper) {
-                if(mapper[i] != undefined) mapper[i].s.pause();
+                if(mapper[i] != undefined) {
+                    mapper[i].s.pause();
+                    console.log(i, "暂停");
+                }
             }
             // console.log(num, "tunnel塞住了,推不出去");
         }
