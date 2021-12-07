@@ -62,11 +62,11 @@ function send_data() {
         let id = get_noblock_tunnel(clients, tunnel_num);
         if(id == -1) {
             clients[0].write(send_buffer);
-            console.log("需要节流", new Date());
             return false;
         }
         let is_b = clients[id].write(send_buffer);
         if(!is_b) {
+            console.log(id, "需要节流", new Date());
             clients[id]._paused = true;
         }
         return true;

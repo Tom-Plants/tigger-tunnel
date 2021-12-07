@@ -72,7 +72,6 @@ function init_clients() {
                 --connected_count;
             }).on("drain", () => {
                 tunnel_block = false;
-                console.log("num", ":", i, "has drained");
                 client._paused = false;
                 for(let j in mapper) {
                     if(mapper[j] != undefined) mapper[j].s.resume();
