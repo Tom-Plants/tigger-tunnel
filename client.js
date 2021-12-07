@@ -12,6 +12,8 @@ const   local_port = 10009;             //本地监听端口
 const   local_host = "0.0.0.0";                //本地监听地址
 
 let     allow_data_transfer = false;    //数据传输标志位
+let     tunnel_block = false;   //多线程通道堵塞时，该值为true
+
 
 let     clients = [];
 let     pending_data = [];
@@ -69,6 +71,7 @@ function init_clients() {
                 console.log("num", ":", i, "has disconnected");
                 --connected_count;
             }).on("drain", () => {
+                tunnel_block = false;
                 console.log("num", ":", i, "has drained");
                 client._paused = false;
                 for(let j in mapper) {
@@ -98,6 +101,10 @@ function init_local_server() {
         //注意释放
         mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort)};
 
+        if(tunnel_block == true) {
+            socket.pause();
+        }
+
         socket.on("close", () => {
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh();
@@ -116,6 +123,7 @@ function init_local_server() {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
             if(send_data(data, referPort, cur) == false) {
+                tunnel_block = true;
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].s.pause();
                 }

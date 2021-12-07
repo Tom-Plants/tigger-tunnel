@@ -16,6 +16,7 @@ let     pending_data = [];
 let     mapper = {};
 
 let     allow_data_transfer = false;    //数据传输标志位
+let     tunnel_block = false;   //多线程通道堵塞时，该值为true
 
 init_server()();
 
@@ -31,6 +32,10 @@ function new_outgoing(num) {
         rh: ph(data_recive, num)
     };
 
+    if(tunnel_block == true) {
+        conn.pause();
+    }
+
     conn.on("connect", () => {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
@@ -43,6 +48,7 @@ function new_outgoing(num) {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
         if(send_data(data, num, cur) == false) {
+            tunnel_block = true;
             for(let i in mapper) {
                 if(mapper[i] != undefined) mapper[i].s.pause();
             }
@@ -124,6 +130,7 @@ function init_server() {
                 console.log("tunnel has down");
             }).on("drain", () => {
                 socket._paused = false;
+                tunnel_block = false;
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].s.resume();
                 }
