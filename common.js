@@ -60,6 +60,7 @@ function send_data() {
         let send_buffer = Buffer.concat([num_buffer, data]);
 
         let id = get_noblock_tunnel(clients, tunnel_num);
+        console.log(id);
         if(id == -1) {
             clients[0].write(send_buffer);
             return false;
