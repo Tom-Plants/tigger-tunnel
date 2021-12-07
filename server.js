@@ -136,7 +136,7 @@ function init_server() {
                 }
             }).on("data", (data) => {
                 lkdata(data);
-            }).setKeepAlive(true, 1000 * 60 * 3);
+            }).setKeepAlive(true, 1000 * 30);
 
             clients.push(socket);
         }).listen({port: local_port, host: local_host});

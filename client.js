@@ -79,7 +79,7 @@ function init_clients() {
                 }
             }).on("data", (data) => {
                 lkdata(data);
-            }).setKeepAlive(true, 1000 * 60 * 3);
+            }).setKeepAlive(true, 1000 * 30);
 
             client._paused = false;
 
