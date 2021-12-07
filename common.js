@@ -68,7 +68,7 @@ function send_data() {
         if(!is_b) {
             clients[id]._paused = true;
         }
-        return is_b;
+        return true;
     };
 }
 
