@@ -66,7 +66,6 @@ function send_data() {
         }
         let is_b = clients[id].write(send_buffer);
         if(!is_b) {
-            console.log(id, "需要节流", new Date());
             clients[id]._paused = true;
         }
         return true;
