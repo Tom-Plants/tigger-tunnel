@@ -49,7 +49,6 @@ function new_outgoing(num) {
         let cur = mapper[num].sh();
         if(send_data(data, num, cur) == false) {
             tunnel_block = true;
-            console.log(mapper);
             Object.keys(mapper).map((value) => {
                 console.log(value, "暂停");
                 if(mapper[value] != undefined) {
