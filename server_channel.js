@@ -48,16 +48,20 @@ function init_server(mapper, clients, new_outgoing) {
             if(clients[i] == undefined) {
                 clients[i] = socket;
                 found = true;
+                console.log("找到了", i);
                 break;
             }
             if(clients[i]._state == 0) {
                 clients[i] = socket;
                 found = true;
+                console.log("找到了", i);
                 break;
             }
         }
+        
 
         if(!found) {
+            console.log("没找到");
             socket.destroy();
             return;
         }
