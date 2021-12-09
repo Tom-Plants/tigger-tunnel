@@ -25,6 +25,8 @@ function new_client(lkdata) {
         }
     }).on("data", (data) => {
         lkdata(data);
+    }).on("close", () => {
+        client._state = 0;
     }).setKeepAlive(true, 1000 * 30);
 
     client._paused = false; //未阻塞
@@ -58,13 +60,16 @@ function init_clients(mapper, clients) {
             }
 
         });
-        let client = new_client(lkdata);
-        client.on("close", () => {
-            client._state = 0;
-            console.log("新连接");
-            new_client(lkdata);
-        });
-        clients.push(client);
+        if(clients[i] == undefined) {
+            clients[i] = new_client(lkdata);
+            console.log("找到了", i);
+            continue;
+        }
+        if(clients[i]._state == 0 && clients[i].connecting == false) {
+            clients[i] = new_client(lkdata);
+            console.log("找到了", i);
+            continue;
+        }
     }
 }
 

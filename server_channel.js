@@ -66,7 +66,7 @@ function init_server(mapper, clients, new_outgoing) {
             return;
         }
 
-        reg_client(socket, clients, lkdata);
+        reg_client(socket, clients, lkdata, mapper);
         socket.on("close", () => {
             socket._state = 0;
         });
@@ -74,7 +74,7 @@ function init_server(mapper, clients, new_outgoing) {
     }).listen({port: local_port, host: local_host});
 }
 
-function reg_client(socket, clients, lkdata) {
+function reg_client(socket, clients, lkdata, mapper) {
     socket._paused = false;
     socket._state = 1;
 

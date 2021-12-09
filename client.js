@@ -12,8 +12,11 @@ let     tunnel_block = false;   //多线程通道堵塞时，该值为true
 let     clients = [];
 let     mapper = {};
 
-init_clients(mapper, clients);
 init_local_server();
+
+setInterval(() => {
+    init_clients(mapper, clients);
+}, 1000);
 
 function init_local_server() {
     return createServer({
