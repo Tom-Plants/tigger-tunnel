@@ -59,9 +59,9 @@ function send_data() {
         num_buffer.writeUInt16LE(referPort, 6);
         let send_buffer = Buffer.concat([num_buffer, data]);
 
-        let id = get_noblock_tunnel(clients, tunnel_num);
+        let {id, count} = get_noblock_tunnel(clients, tunnel_num);
         if(id == -1) {
-            clients[0].write(send_buffer);
+            clients[count].write(send_buffer);
             return false;
         }
         let is_b = clients[id].write(send_buffer);
@@ -72,16 +72,17 @@ function send_data() {
     };
 }
 
-function get_noblock_tunnel(clients, tunnel_num) {
-    for(let i = 0; i < tunnel_num; i++)
-    {
-        if(clients[i]._paused == false)
-        {
-            return i;
+function get_noblock_tunnel() {
+    let count = 0;
+    return (clients, tunnel_num) => {
+        let num = count;
+        while(true) {
+            if(clients[num]._paused == false) { count = num; return {id: num, count}; }
+            num ++;
+            if(num == tunnel_num) { num = 0; }
+            if(num == (count - 1)) { return {id: -1, count}; }
         }
-
     }
-    return -1;
 }
 
 module.exports = {
