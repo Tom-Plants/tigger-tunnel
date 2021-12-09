@@ -1,25 +1,19 @@
-const Client = require('net').Socket;
-const {Server, createServer, createConnection} = require('net');
-const {handleData, print_allow_write} = require("./common");
-const {sd, cd} = require("./common").send_data();
+const {createConnection} = require('net');
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
+const {init_server} = require("./server_channel");
+const _send_data = require("./server_channel").send_data;
 
 const   tunnel_num = 4;                 //通道数
 const   target_port = 444;             //服务器端口
 const   target_host = "localhost";               //服务器地址
-const   local_port = 8080;             //本地监听端口
-const   local_host = "0.0.0.0";                //本地监听地址
 
 let     clients = [];
-let     pending_data = [];
 let     mapper = {};
 
-let     allow_data_transfer = false;    //数据传输标志位
 let     tunnel_block = false;   //多线程通道堵塞时，该值为true
 
-init_server()();
-
+init_server(mapper, clients, new_outgoing);
 
 function new_outgoing(num) {
 
@@ -77,77 +71,6 @@ function new_outgoing(num) {
     }).setKeepAlive(true, 200);
 }
 
-function init_server() {
-    let connected_count = 0;
-    
-    return () => {
-        createServer({}, (socket) => {
-            let lkdata = handleData((data) => {
-                let pkt_num = data.readInt16LE(0);
-                let num = data.readUInt16LE(2);
-                let real_data = data.slice(4);
-
-                if(real_data.length == 5 && pkt_num == -1) {
-                    let cmd = real_data.toString();
-                    if(cmd == "COPEN") {
-                        //这里会创建针对mapper[num]的对象
-                        if(mapper[num] != undefined) {
-                            return;
-                        }
-                        new_outgoing(num);
-                        return;
-                    }else if(cmd == "PTCLS") {
-                        if(mapper[num] != undefined) {
-                            mapper[num].s.destroy();
-                            mapper[num].rh = undefined;
-                            mapper[num].sh = undefined;
-                            mapper[num] = undefined;
-                        }
-                        return;
-                    }
-                }
-
-                if(mapper[num] != undefined) {
-                    mapper[num].rh(pkt_num, real_data);
-                }
-
-            });
-            socket._paused = false;
-            socket._state = 1;
-
-            connected_count++
-            if(connected_count == tunnel_num) {
-                console.log("ALL tunnel has been connected !");
-            }
-            if(connected_count > tunnel_num) {
-                socket.destroy();
-                return;
-            }
-
-
-            socket.on("error", (e) => {
-            }).on("close", () => {
-                --connected_count;
-            }).on("drain", () => {
-                socket._paused = false;
-                let s_rtn = cd(clients, tunnel_num);
-                if(s_rtn == true) {
-                    tunnel_block = false;
-                    for(let i in mapper) {
-                        if(mapper[i] != undefined) mapper[i].s.resume();
-                    }
-                }
-            }).on("data", (data) => {
-                lkdata(data);
-            }).on("timeout", () => {
-                socket.end();
-            }).setKeepAlive(true, 1000 * 30)
-            .setTimeout(1000 * 5);
-
-            clients.push(socket);
-        }).listen({port: local_port, host: local_host});
-    }
-}
 
 function data_recive(data, referPort, pkt) {
     if(mapper[referPort] != undefined) {
@@ -181,6 +104,5 @@ function data_recive(data, referPort, pkt) {
 }
 
 function send_data(data, referPort, current_packet_num) {
-    if(referPort == undefined) throw "!";
-    return sd(data, referPort, clients, tunnel_num, current_packet_num);
+    return _send_data(data, referPort, current_packet_num, clients);
 }
