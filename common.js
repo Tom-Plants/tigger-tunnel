@@ -79,7 +79,13 @@ function _get_noblock_tunnel() {
     return (clients, tunnel_num) => {
         let num = count;
         while(true) {
-            if(clients[num]._paused == false) { count = num; count ++; return {id: num, count}; }
+            if(clients[num]._paused == false) {
+                count = num;
+                if(++count == tunnel_num) {
+                    count = 0;
+                }
+                return {id: num, count};
+            }
             num ++;
             if(num == tunnel_num) { num = 0; }
             if(num == count) { return {id: -1, count}; }
