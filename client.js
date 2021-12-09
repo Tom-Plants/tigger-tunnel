@@ -1,11 +1,11 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
-const sd = require("./common").send_data();
+const {sd, cd} = require("./common").send_data();
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 
-const   tunnel_num = 4;                 //通道数
+const   tunnel_num = 32;                 //通道数
 const   target_port = 8080;             //服务器端口
 const   target_host = "ru1.0x7c00.site";               //服务器地址
 const   local_port = 10009;             //本地监听端口
@@ -23,14 +23,7 @@ init_clients()();
 init_local_server();
 
 
-function clear_clients() {
-
-}
-
-
 function init_clients() {
-    let connected_count = 0;
-    
     return () => {
         for(let i = 0; i < tunnel_num; i++) {
 
@@ -58,33 +51,47 @@ function init_clients() {
 
             });
 
-            let client = createConnection({host: target_host, port: target_port}, () => {
+            let client = createConnection({host: target_host, port: target_port})
+            .on("connect", () => {
                 console.log(target_host, ":", target_port, "connect successfull");
-                if(++connected_count == tunnel_num) {
-                    console.log("ALL tunnel has successfull connected !");
-                    allow_data_transfer = true;
-                }
+                client._state = 1; //已连接
+                notify_if_connect_success();
             })
             .on("error", (e) => {
-                console.log(e);
             }).on("close", () => {
-                console.log("num", ":", i, "has disconnected");
-                --connected_count;
+                client._state = 0;
+                client.connect();
             }).on("drain", () => {
-                tunnel_block = false;
                 client._paused = false;
-                for(let j in mapper) {
-                    if(mapper[j] != undefined) mapper[j].s.resume();
+                let s_rtn = cd(clients, tunnel_num);
+                if(s_rtn == true) {
+                    tunnel_block = false;
+                    for(let j in mapper) {
+                        if(mapper[j] != undefined) mapper[j].s.resume();
+                    }
                 }
             }).on("data", (data) => {
                 lkdata(data);
             }).setKeepAlive(true, 1000 * 30);
 
-            client._paused = false;
+            client._paused = false; //未阻塞
+            client._state = 0;  //未连接
 
             clients.push(client);
         }
     };
+}
+
+function notify_if_connect_success() {
+    let count = 0;
+    for(let i of clients) {
+        if(i._state == 1) {
+            count++;
+        }
+    }
+    if(count == tunnel_num) {
+        console.log("ALL tunnel has successfull connected !");
+    }
 }
 
 function init_local_server() {

@@ -1,7 +1,7 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
-const sd = require("./common").send_data();
+const {sd, cd} = require("./common").send_data();
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 
@@ -77,6 +77,17 @@ function new_outgoing(num) {
     }).setKeepAlive(true, 200);
 }
 
+function notify_if_connect_success() {
+    let count = 0;
+    for(let i of clients) {
+        if(i._state == 1) {
+            count++;
+        }
+    }
+    if(count == tunnel_num) {
+        console.log("ALL tunnel has successfull connected !");
+    }
+}
 
 function init_server() {
     let connected_count = 0;
@@ -114,31 +125,33 @@ function init_server() {
 
             });
             socket._paused = false;
-            if(!allow_data_transfer) {
-                ++connected_count;
-                if(connected_count == tunnel_num) {
-                    console.log("ALL tunnel has successfull connected !");
-                    allow_data_transfer = true;
-                }
-            }else {
+            socket._state = 0;
+            notify_if_connect_success();
+
+            if(++connected_count > tunnel_num) {
                 socket.destroy();
                 return;
             }
 
 
             socket.on("error", (e) => {
-                console.log(e);
             }).on("close", () => {
-                console.log("tunnel has down");
+                --connected_count;
             }).on("drain", () => {
                 socket._paused = false;
-                tunnel_block = false;
-                for(let i in mapper) {
-                    if(mapper[i] != undefined) mapper[i].s.resume();
+                let s_rtn = cd(clients, tunnel_num);
+                if(s_rtn == true) {
+                    tunnel_block = false;
+                    for(let i in mapper) {
+                        if(mapper[i] != undefined) mapper[i].s.resume();
+                    }
                 }
             }).on("data", (data) => {
                 lkdata(data);
-            }).setKeepAlive(true, 1000 * 30);
+            }).on("timeout", () => {
+                socket.end();
+            }).setKeepAlive(true, 1000 * 30)
+            .setTimeout(1000 * 5);
 
             clients.push(socket);
         }).listen({port: local_port, host: local_host});

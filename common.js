@@ -54,24 +54,46 @@ function print_allow_write(clients) {
 }
 
 function send_data() {
-    return (data, referPort, clients, tunnel_num, current_packet_num) => {
-        let num_buffer = Buffer.allocUnsafe(8);
-        num_buffer.writeUInt32LE(data.length + 4, 0);
-        num_buffer.writeInt16LE(current_packet_num, 4);
-        num_buffer.writeUInt16LE(referPort, 6);
-        let send_buffer = Buffer.concat([num_buffer, data]);
+    let pending_data = [];
+    return {
+        sd:(data, referPort, clients, tunnel_num, current_packet_num) => {
+            let send_buffer = packet_data(data, current_packet_num, referPort);
+            pending_data.push(send_buffer);
 
-        let {id, count} = get_noblock_tunnel(clients, tunnel_num);
-        if(id == -1) {
-            clients[count].write(send_buffer);
-            return false;
+            let id = get_noblock_tunnel(clients, tunnel_num);
+            if(id == -1) {
+                return false;
+            }
+            let is_b = clients[id].write(pending_data.shift());
+            if(!is_b) {
+                clients[id]._paused = true;
+            }
+            return true;
+        },
+        cd:(clients, tunnel_num) => {
+            while(true) {
+                let send_buffer = pending_data.shift();
+                if(send_buffer == undefined) return true;
+
+                let id = get_noblock_tunnel(clients, tunnel_num);
+                if(id == -1) {
+                    return false;
+                }
+                let is_b = clients[id].write(pending_data.shift());
+                if(!is_b) {
+                    clients[id]._paused = true;
+                }
+            }
         }
-        let is_b = clients[id].write(send_buffer);
-        if(!is_b) {
-            clients[id]._paused = true;
-        }
-        return true;
     };
+}
+
+function packet_data(data, current_packet_num, referPort) {
+    let num_buffer = Buffer.allocUnsafe(8);
+    num_buffer.writeUInt32LE(data.length + 4, 0);
+    num_buffer.writeInt16LE(current_packet_num, 4);
+    num_buffer.writeUInt16LE(referPort, 6);
+    return Buffer.concat([num_buffer, data]);
 }
 
 function _get_noblock_tunnel() {
@@ -79,16 +101,13 @@ function _get_noblock_tunnel() {
     return (clients, tunnel_num) => {
         let num = count;
         while(true) {
-            if(clients[num]._paused == false) {
+            if(clients[num]._paused == false && clients[num]._state == 1) {
                 count = num;
-                if(++count == tunnel_num) {
-                    count = 0;
-                }
-                return {id: num, count};
+                return num;
             }
             num ++;
             if(num == tunnel_num) { num = 0; }
-            if(num == count) { return {id: -1, count}; }
+            if(num == count) { return -1; }
         }
     }
 }
