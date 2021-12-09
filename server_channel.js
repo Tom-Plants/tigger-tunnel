@@ -91,6 +91,7 @@ function reg_client(socket, clients, lkdata) {
     }).on("data", (data) => {
         lkdata(data);
     }).on("timeout", () => {
+        console.log("超时");
         socket.end();
     }).setKeepAlive(true, 1000 * 30)
     .setTimeout(1000 * 5);
