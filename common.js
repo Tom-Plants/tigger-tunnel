@@ -1,7 +1,9 @@
+let get_noblock_tunnel = _get_noblock_tunnel();
 /**
  * 处理粘包分包
  * @param data 处理粘包分包
  */
+
 function handleData(callback) {
     let packetData = null;
     let value = (callback == undefined ? () => {} : callback);
@@ -59,21 +61,21 @@ function send_data() {
         num_buffer.writeUInt16LE(referPort, 6);
         let send_buffer = Buffer.concat([num_buffer, data]);
 
-        let k = get_noblock_tunnel(clients, tunnel_num);
-        console.log(k);
-        if(k.id == -1) {
-            clients[k.count].write(send_buffer);
+        let {id, count} = get_noblock_tunnel(clients, tunnel_num);
+        console.log(id, count);
+        if(id == -1) {
+            clients[count].write(send_buffer);
             return false;
         }
-        let is_b = clients[k.id].write(send_buffer);
+        let is_b = clients[id].write(send_buffer);
         if(!is_b) {
-            clients[k.id]._paused = true;
+            clients[id]._paused = true;
         }
         return true;
     };
 }
 
-function get_noblock_tunnel() {
+function _get_noblock_tunnel() {
     let count = 0;
     return (clients, tunnel_num) => {
         let num = count;
