@@ -82,7 +82,7 @@ function _get_noblock_tunnel() {
             if(clients[num]._paused == false) { count = num; return {id: num, count}; }
             num ++;
             if(num == tunnel_num) { num = 0; }
-            if(num == (count - 1)) { return {id: -1, count}; }
+            if(num == count) { return {id: -1, count}; }
         }
     }
 }
