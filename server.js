@@ -77,18 +77,6 @@ function new_outgoing(num) {
     }).setKeepAlive(true, 200);
 }
 
-function notify_if_connect_success() {
-    let count = 0;
-    for(let i of clients) {
-        if(i._state == 1) {
-            count++;
-        }
-    }
-    if(count == tunnel_num) {
-        console.log("ALL tunnel has successfull connected !");
-    }
-}
-
 function init_server() {
     let connected_count = 0;
     
@@ -125,10 +113,13 @@ function init_server() {
 
             });
             socket._paused = false;
-            socket._state = 0;
-            notify_if_connect_success();
+            socket._state = 1;
 
-            if(++connected_count > tunnel_num) {
+            connected_count++
+            if(connected_count == tunnel_num) {
+                console.log("ALL tunnel has been connected !");
+            }
+            if(connected_count > tunnel_num) {
                 socket.destroy();
                 return;
             }
