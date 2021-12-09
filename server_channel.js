@@ -79,6 +79,7 @@ function reg_client(socket, clients, lkdata) {
     socket._state = 1;
 
     socket.on("error", (e) => {
+        console.log(e);
     }).on("drain", () => {
         socket._paused = false;
         let s_rtn = cd(clients, tunnel_num);

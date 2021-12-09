@@ -13,6 +13,7 @@ function new_client(lkdata) {
         client._state = 1; //已连接
     })
     .on("error", (e) => {
+        console.log(e);
     }).on("drain", () => {
         client._paused = false;
         let s_rtn = cd(clients, tunnel_num);
@@ -60,6 +61,7 @@ function init_clients(mapper, clients) {
         let client = new_client(lkdata);
         client.on("close", () => {
             client._state = 0;
+            console.log("新连接");
             new_client(lkdata);
         });
         clients.push(client);
