@@ -4,7 +4,6 @@ const st = require("./packet_handler").st_handle;
 const {init_server} = require("./server_channel");
 const _send_data = require("./server_channel").send_data;
 
-const   tunnel_num = 4;                 //通道数
 const   target_port = 444;             //服务器端口
 const   target_host = "localhost";               //服务器地址
 
