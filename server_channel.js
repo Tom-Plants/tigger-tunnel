@@ -9,8 +9,6 @@ const   tunnel_num = 4;                 //通道数
 const   local_port = 8080;             //服务器端口
 const   local_host = "0.0.0.0";               //服务器地址
 
-init_server();
-
 
 function init_server(mapper, clients, new_outgoing) {
     createServer({}, (socket) => {
