@@ -3,9 +3,7 @@ const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {init_server} = require("./server_channel");
 const send_data = require("./snd_buffer").push_data;
-
-const   target_port = 444;             //服务器端口
-const   target_host = "localhost";               //服务器地址
+const {s_target_host, s_target_port} = require("./config");
 
 let     mapper = {};
 
@@ -14,7 +12,7 @@ init_server(mapper, new_outgoing);
 function new_outgoing(num) {
 
 
-    let conn = createConnection({host: target_host, port: target_port, allowHalfOpen: true});
+    let conn = createConnection({host: s_target_host, port: s_target_port, allowHalfOpen: true});
 
     mapper[num] = {
         s:conn,

@@ -6,11 +6,7 @@ const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {push_client} = require("./clients_controller");
 const {clear_data} = require("./snd_buffer");
-
-const   tunnel_num = 4;                 //通道数
-const   local_port = 8080;             //服务器端口
-const   local_host = "0.0.0.0";               //服务器地址
-
+const {s_local_port, s_local_host} = require("./config");
 
 function init_server(mapper, new_outgoing) {
     createServer({}, (socket) => {
@@ -53,7 +49,7 @@ function init_server(mapper, new_outgoing) {
 
         reg_client(socket, lkdata, mapper);
 
-    }).listen({port: local_port, host: local_host});
+    }).listen({port: s_local_port, host: s_local_host});
 }
 
 function reg_client(socket, lkdata, mapper) {
@@ -77,12 +73,6 @@ function reg_client(socket, lkdata, mapper) {
     .setTimeout(1000 * 5);
 }
 
-function send_data(data, referPort, current_packet_num, clients) {
-    if(referPort == undefined) throw "!";
-    return sd(data, referPort, clients, tunnel_num, current_packet_num);
-}
-
 module.exports = {
-    send_data,
     init_server
 }

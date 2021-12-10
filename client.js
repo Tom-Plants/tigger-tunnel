@@ -3,9 +3,7 @@ const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {init_clients} = require("./client_channel");
 const send_data = require("./snd_buffer").push_data;
-
-const   local_port = 10009;             //本地监听端口
-const   local_host = "0.0.0.0";                //本地监听地址
+const {local_port, local_host} = require("./config");
 
 let     mapper = {};
 

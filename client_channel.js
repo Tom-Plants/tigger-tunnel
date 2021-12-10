@@ -1,6 +1,6 @@
 const {createConnection} = require('net');
 const {recv_handle} = require("./rcv_buffer");
-const {target_host, target_port} = require("./client_config");
+const {target_host, target_port} = require("./config");
 const {clear_data} = require("./snd_buffer");
 const { push_client, need_new_client } = require('./clients_controller');
 

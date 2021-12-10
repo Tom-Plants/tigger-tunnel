@@ -1,4 +1,4 @@
-const {tunnel_num} = require("./client_config");
+const {tunnel_num} = require("./config");
 const {Socket} = require("net");
 
 /**
