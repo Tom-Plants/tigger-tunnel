@@ -63,7 +63,7 @@ function reg_client(socket, lkdata, mapper) {
         socket._paused = false;
         let s_rtn = clear_data();
         if(s_rtn == true) {
-            for(let i in tapper) {
+            for(let i in mapper) {
                 if(mapper[i] != undefined) mapper[i].s.resume();
             }
         }
