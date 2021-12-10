@@ -67,6 +67,7 @@ function reg_client(socket, lkdata, mapper) {
         lkdata(data);
     }).on("timeout", () => {
         socket.end();
+        socket._state = 0;
     }).on("close", () => {
         socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
