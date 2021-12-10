@@ -1,24 +1,25 @@
 const {createConnection} = require('net');
-const {handleData} = require("./common");
-const {sd, cd} = require("./common").send_data();
+const {recv_handle} = require("./rcv_buffer");
+const {target_host, target_port} = require("./client_config");
+const {clear_data} = require("./snd_buffer");
+const { push_client, need_new_client } = require('./clients_controller');
 
-const   tunnel_num = 4;                //通道数
-const   target_port = 8080;             //服务器端口
-const   target_host = "ru1.0x7c00.site";               //服务器地址
 
 function new_client(lkdata) {
     let client = createConnection({host: target_host, port: target_port})
     .on("connect", () => {
         console.log(target_host, ":", target_port, "connect successfull");
-        client._state = 1; //已连接
-    })
-    .on("error", (e) => {
+        if(!push_client(client)) {
+            client.destroy();
+            return;
+        }
+        client.emit("drain");
+    }).on("error", (e) => {
         console.log(e);
     }).on("drain", () => {
         client._paused = false;
-        let s_rtn = cd(clients, tunnel_num);
+        let s_rtn = clear_data();
         if(s_rtn == true) {
-            tunnel_block = false;
             for(let j in mapper) {
                 if(mapper[j] != undefined) mapper[j].s.resume();
             }
@@ -28,16 +29,11 @@ function new_client(lkdata) {
     }).on("close", () => {
         client._state = 0;
     }).setKeepAlive(true, 1000 * 30);
-
-    client._paused = false; //未阻塞
-    client._state = 0;  //未连接
-
-    return client;
 }
 
-function init_clients(mapper, clients) {
-    for(let i = 0; i < tunnel_num; i++) {
-        let lkdata = handleData((data) => {
+function init_clients(mapper) {
+    while(true) {
+        let lkdata = recv_handle((data) => {
             let pkt_num = data.readInt16LE(0);
             let num = data.readUInt16LE(2);
             let real_data = data.slice(4);
@@ -60,25 +56,12 @@ function init_clients(mapper, clients) {
             }
 
         });
-        if(clients[i] == undefined) {
-            clients[i] = new_client(lkdata);
-            console.log("找到了", i);
-            continue;
-        }
-        if(clients[i]._state == 0 && clients[i].connecting == false) {
-            clients[i] = new_client(lkdata);
-            console.log("找到了", i);
-            continue;
+        if(need_new_client()) {
+            new_client(lkdata);
         }
     }
 }
 
-function send_data(data, referPort, current_packet_num, clients) {
-    if(referPort == undefined) throw "!";
-    return sd(data, referPort, clients, tunnel_num, current_packet_num);
-}
-
 module.exports = {
-    send_data,
     init_clients
 }

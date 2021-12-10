@@ -2,17 +2,14 @@ const {createConnection} = require('net');
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {init_server} = require("./server_channel");
-const _send_data = require("./server_channel").send_data;
+const send_data = require("./snd_buffer").push_data;
 
 const   target_port = 444;             //服务器端口
 const   target_host = "localhost";               //服务器地址
 
-let     clients = [];
 let     mapper = {};
 
-let     tunnel_block = false;   //多线程通道堵塞时，该值为true
-
-init_server(mapper, clients, new_outgoing);
+init_server(mapper, new_outgoing);
 
 function new_outgoing(num) {
 
@@ -24,10 +21,6 @@ function new_outgoing(num) {
         sh: st(),
         rh: ph(data_recive, num)
     };
-
-    if(tunnel_block == true) {
-        conn.pause();
-    }
 
     conn.on("connect", () => {
         if(mapper[num] == undefined) { return };
@@ -41,13 +34,11 @@ function new_outgoing(num) {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
         if(send_data(data, num, cur) == false) {
-            tunnel_block = true;
             Object.keys(mapper).map((value) => {
                 if(mapper[value] != undefined) {
                     mapper[value].s.pause();
                 }
             });
-            // console.log(num, "tunnel塞住了,推不出去");
         }
     }).on("close", () => {
         if(mapper[num] == undefined) { return };
@@ -100,8 +91,4 @@ function data_recive(data, referPort, pkt) {
     }else {
         send_data(Buffer.from("PTCLS"), referPort, -1);
     }
-}
-
-function send_data(data, referPort, current_packet_num) {
-    return _send_data(data, referPort, current_packet_num, clients);
 }

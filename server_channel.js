@@ -1,16 +1,17 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
-const {sd, cd} = require("./common").send_data();
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
+const {push_client} = require("./clients_controller");
+const {clear_data} = require("./snd_buffer");
 
 const   tunnel_num = 4;                 //通道数
 const   local_port = 8080;             //服务器端口
 const   local_host = "0.0.0.0";               //服务器地址
 
 
-function init_server(mapper, clients, new_outgoing) {
+function init_server(mapper, new_outgoing) {
     createServer({}, (socket) => {
         let lkdata = handleData((data) => {
             let pkt_num = data.readInt16LE(0);
@@ -43,61 +44,36 @@ function init_server(mapper, clients, new_outgoing) {
 
         });
 
-        let found = false;
-        for(let i = 0; i < tunnel_num; i++) {
-            if(clients[i] == undefined) {
-                clients[i] = socket;
-                found = true;
-                console.log("找到了", i);
-                break;
-            }
-            if(clients[i]._state == 0) {
-                clients[i] = socket;
-                found = true;
-                console.log("找到了", i);
-                break;
-            }
-        }
-        
-
-        if(!found) {
-            console.log("没找到");
+        if(!push_client(socket)) {
             socket.destroy();
             return;
         }
+        socket.emit("drain");
 
-        reg_client(socket, clients, lkdata, mapper);
-        socket.on("close", () => {
-            socket._state = 0;
-        });
+        reg_client(socket, lkdata, mapper);
 
     }).listen({port: local_port, host: local_host});
 }
 
-function reg_client(socket, clients, lkdata, mapper) {
-    socket._paused = false;
-    socket._state = 1;
-
+function reg_client(socket, lkdata, mapper) {
     socket.on("error", (e) => {
         console.log(e);
     }).on("drain", () => {
         socket._paused = false;
-        let s_rtn = cd(clients, tunnel_num);
+        let s_rtn = clear_data();
         if(s_rtn == true) {
-            tunnel_block = false;
-            for(let i in mapper) {
+            for(let i in tapper) {
                 if(mapper[i] != undefined) mapper[i].s.resume();
             }
         }
     }).on("data", (data) => {
         lkdata(data);
     }).on("timeout", () => {
-        console.log("超时");
         socket.end();
+    }).on("close", () => {
+        socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
     .setTimeout(1000 * 5);
-
-    return socket;
 }
 
 function send_data(data, referPort, current_packet_num, clients) {

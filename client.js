@@ -2,20 +2,17 @@ const {createServer} = require('net');
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {init_clients} = require("./client_channel");
-const _send_data = require("./client_channel").send_data;
+const send_data = require("./snd_buffer").push_data;
 
 const   local_port = 10009;             //本地监听端口
 const   local_host = "0.0.0.0";                //本地监听地址
 
-let     tunnel_block = false;   //多线程通道堵塞时，该值为true
-
-let     clients = [];
 let     mapper = {};
 
 init_local_server();
 
 setInterval(() => {
-    init_clients(mapper, clients);
+    init_clients(mapper);
 }, 1000);
 
 function init_local_server() {
@@ -30,10 +27,6 @@ function init_local_server() {
         }
         //注意释放
         mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort)};
-
-        if(tunnel_block == true) {
-            socket.pause();
-        }
 
         socket.on("close", () => {
             if(mapper[referPort] == undefined) { return };
@@ -53,11 +46,9 @@ function init_local_server() {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
             if(send_data(data, referPort, cur) == false) {
-                tunnel_block = true;
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].s.pause();
                 }
-                //console.log(referPort, "tunnel塞住了,推不出去");
             }
         }).on("error", () => {})
         .on("drain", () => {
@@ -99,8 +90,4 @@ function data_recive(data, referPort, pkt) {
     }else {
         send_data(Buffer.from("PTCLS"), referPort, -1);
     }
-}
-
-function send_data(data, referPort, current_packet_num) {
-    return _send_data(data, referPort, current_packet_num, clients);
 }
