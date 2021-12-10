@@ -7,5 +7,6 @@ module.exports = {
     s_target_port: 444,
     s_target_host: "localhost",
     s_local_port: 8080,
-    s_local_host: "0.0.0.0"
+    s_local_host: "0.0.0.0",
+    tunnel_timeout: 8 
 }

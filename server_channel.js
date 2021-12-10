@@ -6,7 +6,7 @@ const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {push_client} = require("./clients_controller");
 const {clear_data} = require("./snd_buffer");
-const {s_local_port, s_local_host} = require("./config");
+const {s_local_port, s_local_host, tunnel_timeout} = require("./config");
 
 function init_server(mapper, new_outgoing) {
     createServer({}, (socket) => {
@@ -70,7 +70,7 @@ function reg_client(socket, lkdata, mapper) {
     }).on("close", () => {
         socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
-    .setTimeout(1000 * 5);
+    .setTimeout(1000 * tunnel_timeout);
 }
 
 module.exports = {
