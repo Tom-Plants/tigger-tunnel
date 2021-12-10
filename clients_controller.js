@@ -61,7 +61,7 @@ function get_noblock_client() {
 function need_new_client() {
     let count = 0;
     for(let i = 0; i < tunnel_num; i++) {
-        if(clients[i]._state == 1) {
+        if(clients[i] != undefined && clients[i]._state == 1) {
             //有一个无法传输client
             count ++;
             continue;

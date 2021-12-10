@@ -1,6 +1,7 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
 const {handleData, print_allow_write} = require("./common");
+const {recv_handle} = require("./rcv_buffer");
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {push_client} = require("./clients_controller");
@@ -13,7 +14,7 @@ const   local_host = "0.0.0.0";               //服务器地址
 
 function init_server(mapper, new_outgoing) {
     createServer({}, (socket) => {
-        let lkdata = handleData((data) => {
+        let lkdata = recv_handle((data) => {
             let pkt_num = data.readInt16LE(0);
             let num = data.readUInt16LE(2);
             let real_data = data.slice(4);
