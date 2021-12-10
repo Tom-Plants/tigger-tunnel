@@ -27,6 +27,7 @@ function new_client(lkdata, mapper) {
     }).on("data", (data) => {
         lkdata(data);
     }).on("close", () => {
+        client._state = 0;
     }).on("end", () => {
         client.end();
         client._state = 0;
