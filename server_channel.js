@@ -6,7 +6,8 @@ const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {push_client} = require("./clients_controller");
 const {clear_data} = require("./snd_buffer");
-const {s_local_port, s_local_host, tunnel_timeout} = require("./config");
+const {s_local_port, s_local_host, max_tunnel_timeout, min_tunnel_timeout} = require("./config");
+const {randomInt} = require("crypto");
 
 function init_server(mapper, new_outgoing) {
     createServer({allowHalfOpen: true}, (socket) => {
@@ -65,13 +66,15 @@ function reg_client(socket, lkdata, mapper) {
         }
     }).on("data", (data) => {
         lkdata(data);
-    }).on("timeout", () => {
-        socket.end();
-        socket._state = 0;
     }).on("close", () => {
         socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
-    .setTimeout(1000 * tunnel_timeout);
+    setTimeout(() => {
+        if(socket._state == 1) {
+            socket.end();
+            socket._state = 0;
+        }
+    }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
 }
 
 module.exports = {
