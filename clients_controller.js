@@ -45,7 +45,7 @@ function push_client(client) {
 function get_noblock_client() {
     let num = client_pointer;
     while(true) {
-        if(clients[num]._paused == false && clients[num]._state == 1) {
+        if(clients[num] != undefined && clients[num]._paused == false && clients[num]._state == 1) {
             client_pointer = num + 1;
             if(client_pointer == tunnel_num) {
                 client_pointer = 0;
