@@ -6,7 +6,7 @@ const { push_client, need_new_client } = require('./clients_controller');
 
 
 function new_client(lkdata, mapper) {
-    let client = createConnection({host: target_host, port: target_port})
+    let client = createConnection({host: target_host, port: target_port, allowHalfOpen: true})
     .on("connect", () => {
         console.log(target_host, ":", target_port, "connect successfull");
         if(!push_client(client)) {
@@ -27,6 +27,8 @@ function new_client(lkdata, mapper) {
     }).on("data", (data) => {
         lkdata(data);
     }).on("close", () => {
+    }).on("end", () => {
+        client.end();
         client._state = 0;
     }).setKeepAlive(true, 1000 * 30);
 }

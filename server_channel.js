@@ -9,7 +9,7 @@ const {clear_data} = require("./snd_buffer");
 const {s_local_port, s_local_host, tunnel_timeout} = require("./config");
 
 function init_server(mapper, new_outgoing) {
-    createServer({}, (socket) => {
+    createServer({allowHalfOpen: true}, (socket) => {
         let lkdata = recv_handle((data) => {
             let pkt_num = data.readInt16LE(0);
             let num = data.readUInt16LE(2);
@@ -69,7 +69,6 @@ function reg_client(socket, lkdata, mapper) {
         socket.end();
         socket._state = 0;
     }).on("close", () => {
-        socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
     .setTimeout(1000 * tunnel_timeout);
 }
