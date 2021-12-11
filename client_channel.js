@@ -21,7 +21,9 @@ function new_client(lkdata, mapper) {
         let s_rtn = clear_data();
         if(s_rtn == true) {
             for(let j in mapper) {
-                if(mapper[j] != undefined) mapper[j].s.resume();
+                if(mapper[j] != undefined) {
+                    if(mapper[j]._paused == false) mapper[j].s.resume();
+                }
             }
         }
     }).on("data", (data) => {

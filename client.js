@@ -24,7 +24,7 @@ function init_local_server() {
             return;
         }
         //注意释放
-        mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort)};
+        mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort), _paused: false};
 
         socket.on("close", () => {
             if(mapper[referPort] == undefined) { return };
@@ -73,9 +73,11 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].s.end();
                 return;
             }else if(cmd == "PTCTN") {
+                mapper[referPort]._paused = false;
                 mapper[referPort].s.resume();
                 return;
             }else if(cmd == "PTSTP") {
+                mapper[referPort]._paused = true;
                 mapper[referPort].s.pause();
                 return;
             }

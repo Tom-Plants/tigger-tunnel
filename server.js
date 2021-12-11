@@ -17,7 +17,8 @@ function new_outgoing(num) {
     mapper[num] = {
         s:conn,
         sh: st(),
-        rh: ph(data_recive, num)
+        rh: ph(data_recive, num),
+        _paused: false
     };
 
     conn.on("connect", () => {
@@ -74,9 +75,11 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].s.end();
                 return;
             }else if(cmd == "PTCTN") {
+                mapper[referPort]._paused = false;
                 mapper[referPort].s.resume();
                 return;
             }else if(cmd == "PTSTP") {
+                mapper[referPort]._paused = true;
                 mapper[referPort].s.pause();
                 return;
             }

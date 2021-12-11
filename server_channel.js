@@ -61,7 +61,9 @@ function reg_client(socket, lkdata, mapper) {
         let s_rtn = clear_data();
         if(s_rtn == true) {
             for(let i in mapper) {
-                if(mapper[i] != undefined) mapper[i].s.resume();
+                if(mapper[i] != undefined) {
+                    if(mapper[i]._paused == false) mapper[i].s.resume();
+                }
             }
         }
     }).on("data", (data) => {
