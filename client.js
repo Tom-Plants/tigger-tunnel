@@ -14,6 +14,18 @@ setInterval(() => {
     show_mapper(mapper);
 }, 1000);
 
+setInterval(() => {
+    check_dead_conn(mapper);
+}, 1000 * 60);
+
+function check_dead_conn(mapper) {
+    for(let i in mapper) {
+        if(mapper[i] != undefined) {
+            send_data(Buffer.from("PTCHK"), i, -1);
+        }
+    }
+}
+
 function show_mapper(mapper) {
     console.log("vvvvvvvvvvvvvvvvvvvvvvv");
     for(let i in mapper) {
@@ -27,7 +39,7 @@ function show_mapper(mapper) {
 function init_local_server() {
     return createServer({
         allowHalfOpen: true,
-        pauseOnConnect: false
+        pauseOnConnect: true
     }, (socket) => {
         let referPort = socket.remotePort;
         if(referPort == undefined || mapper[referPort] != undefined) {

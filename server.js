@@ -9,6 +9,18 @@ let     mapper = {};
 
 setInterval(show_mapper(mapper), 1000);
 
+setInterval(() => {
+    check_dead_conn(mapper);
+}, 1000 * 60);
+
+function check_dead_conn(mapper) {
+    for(let i in mapper) {
+        if(mapper[i] != undefined) {
+            send_data(Buffer.from("PTCHK"), i, -1);
+        }
+    }
+}
+
 function show_mapper(mapper) {
     return () => {
         console.log("vvvvvvvvvvvvvvvvvvvvvvv");

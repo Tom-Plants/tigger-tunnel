@@ -42,9 +42,22 @@ function init_clients(mapper) {
         let num = data.readUInt16LE(2);
         let real_data = data.slice(4);
 
-        //if(real_data.length == 5 && pkt_num == -1) {
-            //let cmd = real_data.toString();
-        //}
+        if(real_data.length == 5 && pkt_num == -1) {
+            let cmd = real_data.toString();
+
+            if(cmd == "PTCHK") {
+                if(mapper[num] == undefined) {
+                    send_data(Buffer.from("PFCLS"), num, -1);
+                }
+                return;
+            }else if(cmd == "PFCLS") {
+                mapper[num].s.destroy();
+                mapper[num].rh = undefined;
+                mapper[num].sh = undefined;
+                mapper[num] = undefined;
+                return;
+            }
+        }
         
         if(mapper[num] != undefined) {
             mapper[num].rh(pkt_num, real_data);

@@ -1,6 +1,5 @@
 const Client = require('net').Socket;
 const {Server, createServer, createConnection} = require('net');
-const {handleData, print_allow_write} = require("./common");
 const {recv_handle} = require("./rcv_buffer");
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
@@ -8,6 +7,7 @@ const {push_client} = require("./clients_controller");
 const {clear_data} = require("./snd_buffer");
 const {s_local_port, s_local_host, max_tunnel_timeout, min_tunnel_timeout} = require("./config");
 const {randomInt} = require("crypto");
+const send_data = require("./snd_buffer").push_data;
 
 function init_server(mapper, new_outgoing) {
     createServer({allowHalfOpen: true}, (socket) => {
@@ -25,6 +25,17 @@ function init_server(mapper, new_outgoing) {
                         return;
                     }
                     new_outgoing(num);
+                    return;
+                }else if(cmd == "PTCHK") {
+                    if(mapper[num] == undefined) {
+                        send_data(Buffer.from("PFCLS"), num, -1);
+                    }
+                    return;
+                }else if(cmd == "PFCLS") {
+                    mapper[num].s.destroy();
+                    mapper[num].rh = undefined;
+                    mapper[num].sh = undefined;
+                    mapper[num] = undefined;
                     return;
                 }
             }
