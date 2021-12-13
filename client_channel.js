@@ -3,6 +3,7 @@ const {recv_handle} = require("./rcv_buffer");
 const {target_host, target_port} = require("./config");
 const {clear_data} = require("./snd_buffer");
 const { push_client, need_new_client } = require('./clients_controller');
+const send_data = require("./snd_buffer").push_data;
 
 
 function new_client(lkdata, mapper) {
