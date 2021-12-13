@@ -32,10 +32,12 @@ function init_server(mapper, new_outgoing) {
                     }
                     return;
                 }else if(cmd == "PFCLS") {
-                    mapper[num].s.destroy();
-                    mapper[num].rh = undefined;
-                    mapper[num].sh = undefined;
-                    mapper[num] = undefined;
+                    if(mapper[num] != undefined) {
+                        mapper[num].s.destroy();
+                        mapper[num].rh = undefined;
+                        mapper[num].sh = undefined;
+                        mapper[num] = undefined;
+                    }
                     return;
                 }
             }
