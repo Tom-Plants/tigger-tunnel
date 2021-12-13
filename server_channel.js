@@ -19,8 +19,10 @@ function init_server(mapper, new_outgoing) {
             if(real_data.length == 5 && pkt_num == -1) {
                 let cmd = real_data.toString();
                 if(cmd == "COPEN") {
+                    
                     //这里会创建针对mapper[num]的对象
                     if(mapper[num] != undefined) {
+                        console.log("异常");
                         return;
                     }
                     new_outgoing(num);
