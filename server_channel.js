@@ -22,7 +22,6 @@ function init_server(mapper, new_outgoing) {
                     
                     //这里会创建针对mapper[num]的对象
                     if(mapper[num] != undefined) {
-                        console.log("异常");
                         return;
                     }
                     new_outgoing(num);
