@@ -7,6 +7,21 @@ const {s_target_host, s_target_port} = require("./config");
 
 let     mapper = {};
 
+setInterval(show_mapper(mapper), 1000);
+
+function show_mapper(mapper) {
+    return () => {
+        console.log("vvvvvvvvvvvvvvvvvvvvvvv");
+        for(let i in mapper) {
+            if(mapper[i] != undefined) {
+                console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
+            }
+        }
+        console.log("^^^^^^^^^^^^^^^^^^^^^^^");
+
+    }
+}
+
 init_server(mapper, new_outgoing);
 
 function new_outgoing(num) {
