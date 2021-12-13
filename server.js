@@ -104,7 +104,5 @@ function data_recive(data, referPort, pkt) {
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("PTSTP"), referPort, cur);
         }
-    }else {
-        send_data(Buffer.from("PTCLS"), referPort, -1);
     }
 }

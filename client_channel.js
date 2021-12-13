@@ -8,7 +8,7 @@ const { push_client, need_new_client } = require('./clients_controller');
 function new_client(lkdata, mapper) {
     let client = createConnection({host: target_host, port: target_port, allowHalfOpen: true})
     .on("connect", () => {
-        console.log(target_host, ":", target_port, "connect successfull");
+        //console.log(target_host, ":", target_port, "connect successfull");
         if(!push_client(client)) {
             client.destroy();
             return;
@@ -42,18 +42,9 @@ function init_clients(mapper) {
         let num = data.readUInt16LE(2);
         let real_data = data.slice(4);
 
-        if(real_data.length == 5 && pkt_num == -1) {
-            let cmd = real_data.toString();
-            if(cmd == "PTCLS") {
-                if(mapper[num] != undefined) {
-                    mapper[num].s.destroy();
-                    mapper[num].rh = undefined;
-                    mapper[num].sh = undefined;
-                    mapper[num] = undefined;
-                }
-                return;
-            }
-        }
+        //if(real_data.length == 5 && pkt_num == -1) {
+            //let cmd = real_data.toString();
+        //}
         
         if(mapper[num] != undefined) {
             mapper[num].rh(pkt_num, real_data);

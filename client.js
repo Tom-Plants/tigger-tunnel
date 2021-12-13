@@ -11,15 +11,27 @@ init_local_server();
 
 setInterval(() => {
     init_clients(mapper);
+    show_mapper(mapper);
 }, 1000);
+
+function show_mapper(mapper) {
+    console.log("vvvvvvvvvvvvvvvvvvvvvvv");
+    for(let i in mapper) {
+        if(mapper[i] != undefined) {
+            console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
+        }
+    }
+    console.log("^^^^^^^^^^^^^^^^^^^^^^^");
+}
 
 function init_local_server() {
     return createServer({
         allowHalfOpen: true,
-        pauseOnConnect: true
+        pauseOnConnect: false
     }, (socket) => {
         let referPort = socket.remotePort;
         if(referPort == undefined || mapper[referPort] != undefined) {
+            console.log("断流");
             socket.destroy();
             return;
         }
@@ -27,6 +39,7 @@ function init_local_server() {
         mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort), _paused: false};
 
         socket.on("close", () => {
+            console.log(referPort);
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("PTCLS"), referPort, cur);
@@ -87,7 +100,5 @@ function data_recive(data, referPort, pkt) {
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("PTSTP"), referPort, cur);
         }
-    }else {
-        send_data(Buffer.from("PTCLS"), referPort, -1);
     }
 }
