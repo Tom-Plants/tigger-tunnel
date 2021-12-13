@@ -31,7 +31,6 @@ function init_local_server() {
     }, (socket) => {
         let referPort = socket.remotePort;
         if(referPort == undefined || mapper[referPort] != undefined) {
-            console.log("断流");
             socket.destroy();
             return;
         }
@@ -39,7 +38,6 @@ function init_local_server() {
         mapper[referPort] = {s:socket, sh:st(), rh:ph(data_recive, referPort), _paused: false};
 
         socket.on("close", () => {
-            console.log(referPort);
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("PTCLS"), referPort, cur);
