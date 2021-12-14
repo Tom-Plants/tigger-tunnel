@@ -66,7 +66,7 @@ function init_local_server() {
         }).on("data", (data) => {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
-            if((await send_data(data, referPort, cur)) == false) {
+            if((send_data(data, referPort, cur)) == false) {
                 for(let i in mapper) {
                     if(mapper[i] != undefined) mapper[i].s.pause();
                 }

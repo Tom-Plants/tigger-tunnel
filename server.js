@@ -59,7 +59,7 @@ function new_outgoing(num) {
     }).on("data", (data) => {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
-        if((await send_data(data, num, cur)) == false) {
+        if((send_data(data, num, cur)) == false) {
             Object.keys(mapper).map((value) => {
                 if(mapper[value] != undefined) {
                     mapper[value].s.pause();

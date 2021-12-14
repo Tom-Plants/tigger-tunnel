@@ -8,7 +8,7 @@ let pending_data = [];
  * 返回false：缓冲区已满，上层应用需要暂停推入
  */
 function push_data(data, referPort, current_packet_num) {
-    let send = await mix(data, current_packet_num, referPort);
+    let send = mix(data, current_packet_num, referPort);
     pending_data.push(send);
     let client = get_noblock_client();
     if(client == undefined) { return false; }

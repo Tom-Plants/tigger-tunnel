@@ -22,7 +22,7 @@ function recv_handle(callback) {
             if(packet_length == d1.length - 4)
             {
                 packetData = null;
-                value(await uncomp(d1.slice(4, d1.length)));
+                value(uncomp(d1.slice(4, d1.length)));
                 //value(d1.slice(4, d1.length));
                 break;
             }else {
@@ -37,7 +37,7 @@ function recv_handle(callback) {
                     let left = d1.slice(4, packet_length + 4);
                     let right = d1.slice(packet_length + 4, d1.length);
 
-                    value(await uncomp(left));
+                    value(uncomp(left));
                     //value(left);
                     packetData = right;
                     d1 = right;
@@ -49,7 +49,7 @@ function recv_handle(callback) {
 }
 
 function uncomp(data) {
-    let _data = await uncompress(data);
+    let _data = uncompress(data);
     return _data;
 }
 
