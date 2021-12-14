@@ -7,7 +7,7 @@ const {uncompress} = require("./async_compress");
 function recv_handle(callback) {
     let packetData = null;
     let value = (callback == undefined ? () => {} : callback);
-    return async (data) => {
+    return (data) => {
         let d1 = data;
         if(packetData != null) { d1 = Buffer.concat([packetData, d1]); }
         let packet_length;
@@ -48,7 +48,7 @@ function recv_handle(callback) {
     };
 }
 
-async function uncomp(data) {
+function uncomp(data) {
     let _data = await uncompress(data);
     return _data;
 }

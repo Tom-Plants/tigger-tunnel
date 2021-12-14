@@ -1,24 +1,25 @@
 const zstd = require("zstd-codec").ZstdCodec;
 
-function compress(data) {
+let simple;
+function init_compress() {
     return new Promise((resolve) => {
         zstd.run(z => {
-            const simple = new z.Simple();
-            resolve(simple.compress(data));
+            simple = new z.Simple();
+            resolve();
         });
     });
+}
+
+function compress(data) {
+    simple.compress(data, 5);
 }
 
 function uncompress(data) {
-    return new Promise((resolve) => {
-        zstd.run(z => {
-            const simple = new z.Simple();
-            resolve(simple.decompress(data));
-        });
-    });
+    simple.decompress(data);
 }
 
 module.exports = {
+    init_compress,
     uncompress,
     compress
 };

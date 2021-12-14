@@ -63,7 +63,7 @@ function init_local_server() {
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh();
             send_data(Buffer.from("CHALF"), referPort, cur);
-        }).on("data", async (data) => {
+        }).on("data", (data) => {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh();
             if((await send_data(data, referPort, cur)) == false) {

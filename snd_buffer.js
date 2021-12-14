@@ -7,7 +7,7 @@ let pending_data = [];
  * 返回true：缓冲区接收了这个数据包，上层应用可以继续推入
  * 返回false：缓冲区已满，上层应用需要暂停推入
  */
-async function push_data(data, referPort, current_packet_num) {
+function push_data(data, referPort, current_packet_num) {
     let send = await mix(data, current_packet_num, referPort);
     pending_data.push(send);
     let client = get_noblock_client();

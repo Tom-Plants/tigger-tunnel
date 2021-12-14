@@ -11,7 +11,7 @@ const send_data = require("./snd_buffer").push_data;
 
 function init_server(mapper, new_outgoing) {
     createServer({allowHalfOpen: true}, (socket) => {
-        let lkdata = recv_handle(async (data) => {
+        let lkdata = recv_handle((data) => {
             let pkt_num = data.readInt16LE(0);
             let num = data.readUInt16LE(2);
             let real_data = data.slice(4);
