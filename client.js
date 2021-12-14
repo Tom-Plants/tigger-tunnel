@@ -5,6 +5,7 @@ const {init_clients} = require("./client_channel");
 const send_data = require("./snd_buffer").push_data;
 const {local_port, local_host} = require("./config");
 const {init_compress} = require("./async_compress");
+const {k} = require("./async_compress");
     
 
 let     mapper = {};
@@ -35,6 +36,9 @@ function show_mapper(mapper) {
             console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
         }
     }
+    console.log("真实数据大小", k.s);
+    console.log("压缩数据大小", k.m);
+    console.log("压缩率", (k.s - k.m) / k.s);
     console.log("^^^^^^^^^^^^^^^^^^^^^^^");
 }
 
