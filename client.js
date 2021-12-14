@@ -4,6 +4,8 @@ const st = require("./packet_handler").st_handle;
 const {init_clients} = require("./client_channel");
 const send_data = require("./snd_buffer").push_data;
 const {local_port, local_host} = require("./config");
+const {init_compress} = require("./async_compress");
+    
 
 let     mapper = {};
 
@@ -36,7 +38,8 @@ function show_mapper(mapper) {
     console.log("^^^^^^^^^^^^^^^^^^^^^^^");
 }
 
-function init_local_server() {
+async function init_local_server() {
+    await init_compress();
     return createServer({
         allowHalfOpen: true,
         pauseOnConnect: true

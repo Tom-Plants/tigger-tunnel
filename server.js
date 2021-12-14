@@ -4,8 +4,14 @@ const st = require("./packet_handler").st_handle;
 const {init_server} = require("./server_channel");
 const send_data = require("./snd_buffer").push_data;
 const {s_target_host, s_target_port} = require("./config");
+const {init_compress} = require("./async_compress");
 
 let     mapper = {};
+
+
+(async () => {
+    await init_compress();
+})();
 
 setInterval(show_mapper(mapper), 1000);
 
