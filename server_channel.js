@@ -16,7 +16,7 @@ function init_server(mapper, new_outgoing) {
             let pkt_num = data.readInt16LE(0);
             let num = data.readUInt16LE(2);
             let real_data = data.slice(4);
-            real_data = zlib.gunzipSync(real_data);
+            real_data = zlib.unzipSync(real_data);
 
             if(real_data.length == 5 && pkt_num == -1) {
                 let cmd = real_data.toString();

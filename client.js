@@ -1,7 +1,7 @@
 const {createServer} = require('net');
 const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
-const {init_clients} = require("./client_channel");
+const {init_clients, getCompresstion} = require("./client_channel");
 const send_data = require("./snd_buffer").push_data;
 const {local_port, local_host} = require("./config");
 
@@ -33,6 +33,7 @@ function show_mapper(mapper) {
             console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
         }
     }
+    console.log("压缩总计提升:", getCompresstion().cps, "%的性能", "原", getCompresstion().r, "压", getCompresstion().m);
     console.log("^^^^^^^^^^^^^^^^^^^^^^^");
 }
 
