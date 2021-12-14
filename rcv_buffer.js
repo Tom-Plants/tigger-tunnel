@@ -1,3 +1,4 @@
+const {uncompress} = require("./async_compress");
 /**
  * 每一条线都需要一个粘包处理器
  * @param {*} callback 
@@ -6,7 +7,7 @@
 function recv_handle(callback) {
     let packetData = null;
     let value = (callback == undefined ? () => {} : callback);
-    return (data) => {
+    return async (data) => {
         let d1 = data;
         if(packetData != null) { d1 = Buffer.concat([packetData, d1]); }
         let packet_length;
@@ -21,7 +22,8 @@ function recv_handle(callback) {
             if(packet_length == d1.length - 4)
             {
                 packetData = null;
-                value(d1.slice(4, d1.length));
+                value(await uncomp(d1.slice(4, d1.length)));
+                //value(d1.slice(4, d1.length));
                 break;
             }else {
                 if(packet_length > d1.length - 4) //没接收完
@@ -35,7 +37,8 @@ function recv_handle(callback) {
                     let left = d1.slice(4, packet_length + 4);
                     let right = d1.slice(packet_length + 4, d1.length);
 
-                    value(left);
+                    value(await uncomp(left));
+                    //value(left);
                     packetData = right;
                     d1 = right;
                 }
@@ -43,6 +46,11 @@ function recv_handle(callback) {
 
         }
     };
+}
+
+async function uncomp(data) {
+    let _data = Buffer.from(await uncompress(data));
+    return _data;
 }
 
 module.exports = {
