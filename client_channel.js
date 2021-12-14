@@ -46,6 +46,7 @@ function init_clients(mapper) {
         let num = data.readUInt16LE(2);
         let real_data = data.slice(4);
         real_data = await uncompress(real_data);
+        console.log(real_data);
 
         m_data_length += data.length;
         real_data_length += real_data.length;

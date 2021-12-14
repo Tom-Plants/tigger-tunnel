@@ -17,6 +17,7 @@ function init_server(mapper, new_outgoing) {
             let num = data.readUInt16LE(2);
             let real_data = data.slice(4);
             real_data = await uncompress(real_data);
+            console.log(real_data);
 
             if(real_data.length == 5 && pkt_num == -1) {
                 let cmd = real_data.toString();
