@@ -76,6 +76,5 @@ function init_clients(mapper) {
 
 
 module.exports = {
-    init_clients,
-    getCompresstion
+    init_clients
 }
