@@ -5,10 +5,10 @@ async function mix(data, current_packet_num, referPort) {
     num_buffer.writeUInt16LE(referPort, 2);
 
     let length_buffer = Buffer.allocUnsafe(4);
-    length_buffer.writeUInt32LE(g_data.length + num_buffer.length, 0);
 
     let g_data = Buffer.from(await compress(Buffer.concat[num_buffer, data]));
 
+    length_buffer.writeUInt32LE(g_data.length, 0);
 
     return Buffer.concat([length_buffer, g_data]);
 }
