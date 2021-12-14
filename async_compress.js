@@ -1,6 +1,6 @@
 const zstd = require("zstd-codec").ZstdCodec;
 
-async function compress(data) {
+function compress(data) {
     return new Promise((resolve) => {
         zstd.run(z => {
             const simple = new z.Simple();
@@ -9,7 +9,7 @@ async function compress(data) {
     });
 }
 
-async function uncompress(data) {
+function uncompress(data) {
     return new Promise((resolve) => {
         zstd.run(z => {
             const simple = new z.Simple();
