@@ -16,17 +16,18 @@ function init_compress() {
 }
 
 function compress(data) {
-    let _data = lzw.compress(data);
-    return _data;
+    //let _data = lzw.compress(data);
+    return data;
 }
 
 function uncompress(data) {
-    let _data = lzw.decompress(data);
+    //let _data = lzw.decompress(data);
 
     k.m += data.length;
-    k.s += _data.length;
+    //k.s += _data.length;
+    k.s += data.length;
 
-    return _data;
+    return data;
 }
 
 module.exports = {
