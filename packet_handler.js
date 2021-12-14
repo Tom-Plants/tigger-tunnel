@@ -1,13 +1,11 @@
-const zlib = require("zlib");
 function pk_handle(callback, referPort) {
     let cb = callback;
     let recv_count = 0;
     let buffer = {};
     let rp = referPort;
     return (pkt_num, data) => {
-        let ung_data = zlib.gunzipSync(data);
         if(pkt_num == recv_count) {
-            cb(ung_data, rp, recv_count);
+            cb(data, rp, recv_count);
             while(true) {
                 recv_count ++;
                 if(recv_count == 32767) {
@@ -19,7 +17,7 @@ function pk_handle(callback, referPort) {
                 }else break;
             }
         }else {
-            buffer[pkt_num] = ung_data;
+            buffer[pkt_num] = data;
         }
 
     }
