@@ -1,6 +1,6 @@
 const zstd = require("zstd-codec").ZstdCodec;
 const fs = require("fs");
-//const lzw = require("./lzw3.node");
+const lzw = require("./lzw3.node");
 
 let simple;
 
@@ -16,16 +16,17 @@ function init_compress() {
 }
 
 function compress(data) {
-    //let _data = lzw.compress(data);
-
-    k.m += data.length;
-    k.s += data.length;
-
-    return data;
+    let _data = lzw.compress(data);
+    return _data;
 }
 
 function uncompress(data) {
-    return data;
+    let _data = lzw.decompress(data);
+
+    k.m += data.length;
+    k.s += _data.length;
+
+    return _data;
 }
 
 module.exports = {
