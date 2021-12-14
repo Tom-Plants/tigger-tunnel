@@ -47,6 +47,9 @@ function get_noblock_client() {
     while(true) {
         if(clients[num] != undefined && clients[num]._paused == false && clients[num]._state == 1) {
             client_pointer = num;
+            if((++client_pointer) == tunnel_num) {
+                client_pointer = 0;
+            }
             return clients[num];
         }
         num ++;
