@@ -56,10 +56,10 @@ function new_outgoing(num) {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
         send_data(Buffer.from("SHALF"), num, cur);
-    }).on("data", (data) => {
+    }).on("data", async (data) => {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh();
-        if(send_data(data, num, cur) == false) {
+        if((await send_data(data, num, cur)) == false) {
             Object.keys(mapper).map((value) => {
                 if(mapper[value] != undefined) {
                     mapper[value].s.pause();

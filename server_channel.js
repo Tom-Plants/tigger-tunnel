@@ -8,13 +8,15 @@ const {clear_data} = require("./snd_buffer");
 const {s_local_port, s_local_host, max_tunnel_timeout, min_tunnel_timeout} = require("./config");
 const {randomInt} = require("crypto");
 const send_data = require("./snd_buffer").push_data;
+const {uncompress} = require("./async_compress");
 
 function init_server(mapper, new_outgoing) {
     createServer({allowHalfOpen: true}, (socket) => {
-        let lkdata = recv_handle((data) => {
+        let lkdata = recv_handle(async (data) => {
             let pkt_num = data.readInt16LE(0);
             let num = data.readUInt16LE(2);
             let real_data = data.slice(4);
+            real_data = await uncompress(real_data);
 
             if(real_data.length == 5 && pkt_num == -1) {
                 let cmd = real_data.toString();
