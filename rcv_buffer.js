@@ -49,7 +49,7 @@ function recv_handle(callback) {
 }
 
 async function uncomp(data) {
-    let _data = Buffer.from(await uncompress(data));
+    let _data = await uncompress(data);
     return _data;
 }
 
