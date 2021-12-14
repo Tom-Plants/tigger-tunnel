@@ -11,11 +11,11 @@ function init_compress() {
 }
 
 function compress(data) {
-    simple.compress(data, 5);
+    return Buffer.from(simple.compress(data, 5));
 }
 
 function uncompress(data) {
-    simple.decompress(data);
+    return Buffer.from(simple.decompress(data));
 }
 
 module.exports = {
