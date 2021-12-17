@@ -4,17 +4,32 @@ const {target_host, target_port} = require("./config");
 const {clear_data} = require("./snd_buffer");
 const { push_client, need_new_client } = require('./clients_controller');
 const send_data = require("./snd_buffer").push_data;
+const tls = require("tls");
+const fs = require('fs');
 
 function new_client(lkdata, mapper) {
-    let client = createConnection({host: target_host, port: target_port, allowHalfOpen: true})
-    .on("connect", () => {
-        //console.log(target_host, ":", target_port, "connect successfull");
+    let client = tls.connect(
+        {
+            host: target_host,
+            port: target_port,
+            allowHalfOpen: true,
+            ca: fs.readFileSync("./certificate.pem"),
+            checkServerIdentity: (host, cert) => {
+                return undefined;
+            }
+        }, () => {
         if(!push_client(client)) {
             client.destroy();
             return;
         }
         client.emit("drain");
-    }).on("error", (e) => {
+    });
+
+    //client.on("connect", () => {
+        ////console.log(target_host, ":", target_port, "connect successfull");
+    //})
+    
+    client.on("error", (e) => {
         console.log(e);
     }).on("drain", () => {
         client._paused = false;
