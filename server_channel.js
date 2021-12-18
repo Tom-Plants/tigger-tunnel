@@ -80,6 +80,7 @@ function reg_client(socket, lkdata, mapper) {
             }
         }
     }).on("data", (data) => {
+        console.log(data.toString());
         if(socket._reg == false) {
             if(data.toString() == "HELLOHUZHIJIAN2000") {
                 socket._reg = true;
