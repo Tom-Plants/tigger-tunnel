@@ -18,6 +18,7 @@ let client_pointer = 0;
 function push_client(client) {
     client._paused = false;
     client._state = 1;
+    client._reg = false;
     if(clients.length == tunnel_num) {
         //clients满了，检查clients内有无已经销毁的client
         let found = false;
@@ -45,7 +46,10 @@ function push_client(client) {
 function get_noblock_client() {
     let num = client_pointer;
     while(true) {
-        if(clients[num] != undefined && clients[num]._paused == false && clients[num]._state == 1) {
+        if(clients[num] != undefined &&
+            clients[num]._paused == false &&
+            clients[num]._state == 1 &&
+            clients[num]._reg == true) {
             client_pointer = num;
             if((++client_pointer) == tunnel_num) {
                 client_pointer = 0;

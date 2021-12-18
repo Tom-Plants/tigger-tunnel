@@ -22,6 +22,10 @@ function new_client(lkdata, mapper) {
             client.destroy();
             return;
         }
+        //发送客户端唯一标识
+        client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
+            client._reg = true;
+        });
         client.emit("drain");
     });
 

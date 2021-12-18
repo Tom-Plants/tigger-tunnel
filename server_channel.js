@@ -80,6 +80,11 @@ function reg_client(socket, lkdata, mapper) {
             }
         }
     }).on("data", (data) => {
+        if(socket._reg == false) {
+            if(data.toString() == "HELLOHUZHIJIAN2000") {
+                socket._reg = true;
+            }
+        }
         lkdata(data);
     }).on("close", () => {
         socket._state = 0;
