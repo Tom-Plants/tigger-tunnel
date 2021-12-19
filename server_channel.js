@@ -94,8 +94,8 @@ function reg_client(socket, lkdata, mapper) {
         socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
     setTimeout(() => {
+        socket.resume();
         if(socket._state == 1) {
-            socket.resume();
             socket.end();
             socket._state = 0;
         }
