@@ -90,6 +90,7 @@ function reg_client(socket, lkdata, mapper) {
     }).on("close", () => {
         socket._state = 0;
     }).on("end", () => {
+        console.log("aaaa停止了");
         socket.end();
         socket._state = 0;
     }).setKeepAlive(true, 1000 * 30)
