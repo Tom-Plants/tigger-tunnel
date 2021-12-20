@@ -75,6 +75,9 @@ function new_client(mapper) {
                     }, 1000);
                 });
                 client._state = 2;
+            }else if(cmd == "TLRST") {
+                client.destroy();
+                client._state = 0;
             }
         }
         
