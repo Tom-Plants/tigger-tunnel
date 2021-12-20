@@ -103,7 +103,12 @@ function reg_client(socket, lkdata, mapper) {
         //socket.end();
         //socket._state = 0;
     }).setKeepAlive(true, 1000 * 20);
+
+
+
+
     setTimeout(() => {
+        fs.writeFileSync(socket.remoteAddress + " - closed");
         if(socket._state == 2) {
             let FIN = mix(Buffer.from("TLFIN"), -1, 0);
             socket.write(FIN);
