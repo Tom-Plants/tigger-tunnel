@@ -7,6 +7,7 @@ const send_data = require("./snd_buffer").push_data;
 const tls = require("tls");
 const fs = require('fs');
 const config = require("./config");
+const mix = require("./mix_packet");
 
 function new_client(mapper) {
     let client = tls.connect(
