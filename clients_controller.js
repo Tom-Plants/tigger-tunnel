@@ -18,24 +18,17 @@ let client_pointer = 0;
 function push_client(client) {
     client._paused = false;
     client._state = 1;  //已连接
-    if(clients.length == tunnel_num) {
-        //clients满了，检查clients内有无已经销毁的client
-        let found = false;
-        for(let i = 0; i < tunnel_num; i++) {
-            if(clients[i]._state == 0) {
-                //设置销毁的socket为新socket
-                clients[i] = client;
-                found = true;
-                break;
-            }
-        }
-        if(found) {
+    for(let i = 0; i < tunnel_num; i++) {
+        if(clients[i] == undefined) {
+            clients[i] = client;
             return true;
         }
-        return false;
+        if(clients[i]._state == 0) {
+            clients[i] = client;
+            return true;
+        }
     }
-    clients.push(client);
-    return true;
+    return false;
 }
 
 /**
@@ -47,7 +40,7 @@ function get_noblock_client() {
     while(true) {
         if(clients[num] != undefined &&
             clients[num]._paused == false &&
-            clients[num]._state == 2) {
+            clients[num]._state == 1) {
             client_pointer = num;
             if((++client_pointer) == tunnel_num) {
                 client_pointer = 0;
@@ -61,13 +54,12 @@ function get_noblock_client() {
 }
 
 function need_new_client() {
-    if(clients.length < tunnel_num) {
-        return true;
-    }else {
-        for(let i = 0; i < tunnel_num; i++) {
-            if(clients[i]._state == 0) {
-                return true;
-            }
+    for(let i = 0; i < tunnel_num; i++) {
+        if(clients[i] == undefined) {
+            return true;
+        }
+        if(clients[i]._state == 0) {
+            return true;
         }
     }
     return false;

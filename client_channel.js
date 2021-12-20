@@ -21,18 +21,22 @@ function new_client(mapper) {
             }
         }, () => {
             if(!push_client(client)) {
-                let ACK = mix(Buffer.from("TLACK"), -1, 0);
-                client.write(ACK);
-                setTimeout(() => {
-                    client.destroy();
-                }, 1000 * config.time_wait_timeout);
+                client.destroy();
                 return;
             }
+            client._state = 2;
             //发送客户端唯一标识
             client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
-                client._state = 2;
+                let self_check = setInterval(() => {
+                    get_Q(client.remoteAddress, (a) => {
+                        if(a == "0") {
+                            clearInterval(self_check);
+                            client._state = 1;
+                            client.emit("drain");
+                        }
+                    })
+                }, 1000);
             });
-            client.emit("drain");
     });
 
     let lkdata = recv_handle((data) => {
@@ -57,12 +61,19 @@ function new_client(mapper) {
                 }
                 return;
             }else if(cmd == "TLFIN") {
-                let ACK = mix(Buffer.from("TLACK"), -1, 0);
-                client.write(ACK);
-                setTimeout(() => {
-                    client.destroy();
-                }, 1000 * config.time_wait_timeout);
-                client._state = 0;
+                let ACK = mix(Buffer.from("TLFIN"), -1, 0);
+                client.write(ACK, () => {
+                    let self_check = setInterval(() => {
+                        get_Q(client.remoteAddress, (a) => {
+                            if(a == "0") {
+                                clearInterval(self_check);
+                                client.destroy();
+                                client._state = 0;
+                            }
+                        })
+                    }, 1000);
+                });
+                client._state = 2;
             }
         }
         
