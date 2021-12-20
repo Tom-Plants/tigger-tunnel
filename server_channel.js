@@ -10,6 +10,8 @@ const {randomInt} = require("crypto");
 const send_data = require("./snd_buffer").push_data;
 const fs = require('fs');
 const tls = require("tls");
+const mix = require("./mix_packet");
+const config = require("./config");
 
 
 function init_server(mapper, new_outgoing) {
@@ -46,6 +48,10 @@ function init_server(mapper, new_outgoing) {
                         mapper[num] = undefined;
                     }
                     return;
+                }else if(cmd == "TLACK") {
+                    setTimeout(() => {
+                        socket.destroy();
+                    }, 1000 * config.time_wait_timeout);
                 }
             }
 
@@ -88,17 +94,23 @@ function reg_client(socket, lkdata, mapper) {
         }
         lkdata(data);
     }).on("close", () => {
-        socket._state = 0;
+        //socket._state = 0;
     }).on("end", () => {
-        socket.end();
-        socket._state = 0;
-    }).setKeepAlive(true, 1000 * 30)
+        //socket.end();
+        //socket._state = 0;
+    }).setKeepAlive(true, 1000 * 20);
     setTimeout(() => {
-        socket.resume();
-        if(socket._state == 1) {
-            socket.end();
+        if(socket._reg == true) {
+            let FIN = mix(Buffer.from("TLFIN"), -1, 0);
+            socket.write(FIN);
             socket._state = 0;
+        }else {
+            socket.destroy();
         }
+        //if(socket._state == 1) {
+            //socket.end();
+            //socket._state = 0;
+        //}
     }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
 }
 

@@ -6,6 +6,7 @@ const { push_client, need_new_client } = require('./clients_controller');
 const send_data = require("./snd_buffer").push_data;
 const tls = require("tls");
 const fs = require('fs');
+const config = require("./config");
 
 function new_client(lkdata, mapper) {
     let client = tls.connect(
@@ -18,44 +19,17 @@ function new_client(lkdata, mapper) {
                 return undefined;
             }
         }, () => {
-        if(!push_client(client)) {
-            client.destroy();
-            return;
-        }
-        //发送客户端唯一标识
-        client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
-            client._reg = true;
-        });
-        client.emit("drain");
+            if(!push_client(client)) {
+                client.destroy();
+                return;
+            }
+            //发送客户端唯一标识
+            client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
+                client._reg = true;
+            });
+            client.emit("drain");
     });
 
-    //client.on("connect", () => {
-        ////console.log(target_host, ":", target_port, "connect successfull");
-    //})
-    
-    client.on("error", (e) => {
-        console.log(e);
-    }).on("drain", () => {
-        client._paused = false;
-        let s_rtn = clear_data();
-        if(s_rtn == true) {
-            for(let j in mapper) {
-                if(mapper[j] != undefined) {
-                    if(mapper[j]._paused == false) mapper[j].s.resume();
-                }
-            }
-        }
-    }).on("data", (data) => {
-        lkdata(data);
-    }).on("close", () => {
-        client._state = 0;
-    }).on("end", () => {
-        client.end();
-        client._state = 0;
-    }).setKeepAlive(true, 1000 * 30);
-}
-
-function init_clients(mapper) {
     let lkdata = recv_handle((data) => {
         let pkt_num = data.readInt16LE(0);
         let num = data.readUInt16LE(2);
@@ -77,6 +51,14 @@ function init_clients(mapper) {
                     mapper[num] = undefined;
                 }
                 return;
+            }else if(cmd == "TLFIN") {
+                let ACK = mix(Buffer.from("TLACK"), -1, 0);
+                socket.write(ACK, () => {
+                    setTimeout(() => {
+                        client.destroy();
+                    }, 1000 * config.time_wait_timeout);
+                });
+                socket._state = 0;
             }
         }
         
@@ -85,6 +67,34 @@ function init_clients(mapper) {
         }
 
     });
+
+    //client.on("connect", () => {
+        ////console.log(target_host, ":", target_port, "connect successfull");
+    //})
+    
+    client.on("error", (e) => {
+        console.log(e);
+    }).on("drain", () => {
+        client._paused = false;
+        let s_rtn = clear_data();
+        if(s_rtn == true) {
+            for(let j in mapper) {
+                if(mapper[j] != undefined) {
+                    if(mapper[j]._paused == false) mapper[j].s.resume();
+                }
+            }
+        }
+    }).on("data", (data) => {
+        lkdata(data);
+    }).on("close", () => {
+        //client._state = 0;
+    }).on("end", () => {
+        //client.end();
+        //client._state = 0;
+    }).setKeepAlive(true, 1000 * 30);
+}
+
+function init_clients(mapper) {
     if(need_new_client()) {
         new_client(lkdata, mapper);
     }
