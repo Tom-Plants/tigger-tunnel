@@ -29,7 +29,8 @@ function new_client(mapper) {
             //发送客户端唯一标识
             client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
                 let self_check = setInterval(() => {
-                    get_Q(client.remoteAddress, (a) => {
+                    console.log(client.localPort)
+                    get_Q(client.localPort, (a) => {
                         if(a == "0") {
                             clearInterval(self_check);
                             client._state = 1;
@@ -65,8 +66,7 @@ function new_client(mapper) {
                 let ACK = mix(Buffer.from("TLFIN"), -1, 0);
                 client.write(ACK, () => {
                     let self_check = setInterval(() => {
-                        console.log(client.localAddress);
-                        get_Q(client.localAddress, (a) => {
+                        get_Q(client.localPort, (a) => {
                             if(a == "0") {
                                 clearInterval(self_check);
                                 client.destroy();
