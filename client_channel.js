@@ -59,7 +59,7 @@ function new_client(mapper) {
                         client.destroy();
                     }, 1000 * config.time_wait_timeout);
                 });
-                socket._state = 0;
+                client._state = 0;
             }
         }
         
