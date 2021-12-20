@@ -14,7 +14,6 @@ const mix = require("./mix_packet");
 const config = require("./config");
 const get_Q = require("./send_q_getter").get_port_send_Q;
 
-
 function init_server(mapper, new_outgoing) {
     tls.createServer({
         allowHalfOpen: true,
@@ -88,7 +87,7 @@ function reg_client(socket, lkdata, mapper) {
 
                 socket.write(FIN, () => {
                     let self_check = setInterval(() => {
-                        get_Q(socket.remoteAddress, (a) => {
+                        get_Q(socket.remotePort, (a) => {
                             if(a == "0") {
                                 clearInterval(self_check);
                                 socket.destroy();

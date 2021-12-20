@@ -29,7 +29,6 @@ function new_client(mapper) {
             //发送客户端唯一标识
             client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
                 let self_check = setInterval(() => {
-                    console.log(client.localPort)
                     get_Q(client.localPort, (a) => {
                         if(a == "0") {
                             clearInterval(self_check);
