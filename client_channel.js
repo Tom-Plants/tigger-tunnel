@@ -8,6 +8,7 @@ const tls = require("tls");
 const fs = require('fs');
 const config = require("./config");
 const mix = require("./mix_packet");
+const get_Q = require("./send_q_getter").get_port_send_Q;
 
 function new_client(mapper) {
     let client = tls.connect(
