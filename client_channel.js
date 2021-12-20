@@ -2,7 +2,7 @@ const {createConnection} = require('net');
 const {recv_handle} = require("./rcv_buffer");
 const {target_host, target_port} = require("./config");
 const {clear_data} = require("./snd_buffer");
-const { push_client, need_new_client } = require('./clients_controller');
+const { push_client } = require('./clients_controller');
 const send_data = require("./snd_buffer").push_data;
 const tls = require("tls");
 const fs = require('fs');
@@ -21,12 +21,16 @@ function new_client(mapper) {
             }
         }, () => {
             if(!push_client(client)) {
-                client.destroy();
+                let ACK = mix(Buffer.from("TLACK"), -1, 0);
+                client.write(ACK);
+                setTimeout(() => {
+                    client.destroy();
+                }, 1000 * config.time_wait_timeout);
                 return;
             }
             //发送客户端唯一标识
             client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
-                client._reg = true;
+                client._state = 2;
             });
             client.emit("drain");
     });
@@ -57,8 +61,9 @@ function new_client(mapper) {
                 client.write(ACK);
                 setTimeout(() => {
                     client.destroy();
+                    client._state = 0;
                 }, 1000 * config.time_wait_timeout);
-                client._state = 0;
+                client._state = 3;
             }
         }
         
@@ -95,9 +100,7 @@ function new_client(mapper) {
 }
 
 function init_clients(mapper) {
-    if(need_new_client()) {
-        new_client(mapper);
-    }
+    new_client(mapper);
 }
 
 

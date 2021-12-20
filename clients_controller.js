@@ -17,13 +17,12 @@ let client_pointer = 0;
  */
 function push_client(client) {
     client._paused = false;
-    client._state = 1;
-    client._reg = false;
+    client._state = 1;  //已连接
     if(clients.length == tunnel_num) {
         //clients满了，检查clients内有无已经销毁的client
         let found = false;
         for(let i = 0; i < tunnel_num; i++) {
-            if(clients[i]._state == 0 && clients[i].connecting == false) {
+            if(clients[i]._state == 0) {
                 //设置销毁的socket为新socket
                 clients[i] = client;
                 found = true;
@@ -48,8 +47,7 @@ function get_noblock_client() {
     while(true) {
         if(clients[num] != undefined &&
             clients[num]._paused == false &&
-            clients[num]._state == 1 &&
-            clients[num]._reg == true) {
+            clients[num]._state == 2) {
             client_pointer = num;
             if((++client_pointer) == tunnel_num) {
                 client_pointer = 0;
@@ -62,24 +60,7 @@ function get_noblock_client() {
     }
 }
 
-function need_new_client() {
-    let count = 0;
-    for(let i = 0; i < tunnel_num; i++) {
-        if(clients[i] != undefined && clients[i]._state == 1) {
-            //有一个无法传输client
-            count ++;
-            continue;
-        }
-    }
-    if(count >= tunnel_num)
-    {
-        return false;
-    }
-    return true;
-}
-
 module.exports = {
     push_client,
-    get_noblock_client,
-    need_new_client
+    get_noblock_client
 }

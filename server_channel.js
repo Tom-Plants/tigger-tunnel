@@ -49,9 +49,9 @@ function init_server(mapper, new_outgoing) {
                     }
                     return;
                 }else if(cmd == "TLACK") {
-                    setTimeout(() => {
-                        socket.destroy();
-                    }, 1000 * config.time_wait_timeout);
+                    clearTimeout(socket._fin_timer);
+                    socket.destroy();
+                    socket._state = 0;
                 }
             }
 
@@ -62,7 +62,11 @@ function init_server(mapper, new_outgoing) {
         });
 
         if(!push_client(socket)) {
-            socket.destroy();
+            let FIN = mix(Buffer.from("TLFIN"), -1, 0);
+            socket.write(FIN);
+            setTimeout(() => {
+                socket.destroy();
+            }, 1000 * config.time_wait_timeout);
             return;
         }
         socket.emit("drain");
@@ -86,9 +90,9 @@ function reg_client(socket, lkdata, mapper) {
             }
         }
     }).on("data", (data) => {
-        if(socket._reg == false) {
+        if(socket._state == 1) {
             if(data.toString() == "HELLOHUZHIJIAN2000") {
-                socket._reg = true;
+                socket._state = 2;
                 return;
             }
         }
@@ -100,12 +104,17 @@ function reg_client(socket, lkdata, mapper) {
         //socket._state = 0;
     }).setKeepAlive(true, 1000 * 20);
     setTimeout(() => {
-        if(socket._reg == true) {
+        if(socket._state == 2) {
             let FIN = mix(Buffer.from("TLFIN"), -1, 0);
             socket.write(FIN);
-            socket._state = 0;
-        }else {
+            socket._state = 3;
+            socket._fin_timer = setTimeout(() => {
+                socket.destroy();
+                socket._state = 0;
+            }, config.time_wait_timeout);
+        } else {
             socket.destroy();
+            socket._state = 0;
         }
         //if(socket._state == 1) {
             //socket.end();
