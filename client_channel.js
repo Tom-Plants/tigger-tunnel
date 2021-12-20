@@ -61,9 +61,8 @@ function new_client(mapper) {
                 client.write(ACK);
                 setTimeout(() => {
                     client.destroy();
-                    client._state = 0;
                 }, 1000 * config.time_wait_timeout);
-                client._state = 3;
+                client._state = 0;
             }
         }
         
