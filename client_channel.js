@@ -8,7 +8,7 @@ const tls = require("tls");
 const fs = require('fs');
 const config = require("./config");
 
-function new_client(lkdata, mapper) {
+function new_client(mapper) {
     let client = tls.connect(
         {
             host: target_host,
@@ -96,7 +96,7 @@ function new_client(lkdata, mapper) {
 
 function init_clients(mapper) {
     if(need_new_client()) {
-        new_client(lkdata, mapper);
+        new_client(mapper);
     }
 }
 
