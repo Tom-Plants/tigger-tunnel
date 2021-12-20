@@ -2,7 +2,7 @@ const {createConnection} = require('net');
 const {recv_handle} = require("./rcv_buffer");
 const {target_host, target_port} = require("./config");
 const {clear_data} = require("./snd_buffer");
-const { push_client } = require('./clients_controller');
+const { push_client, need_new_client } = require('./clients_controller');
 const send_data = require("./snd_buffer").push_data;
 const tls = require("tls");
 const fs = require('fs');
@@ -100,7 +100,9 @@ function new_client(mapper) {
 }
 
 function init_clients(mapper) {
-    new_client(mapper);
+    if(need_new_client()) {
+        new_client(mapper);
+    }
 }
 
 

@@ -60,7 +60,21 @@ function get_noblock_client() {
     }
 }
 
+function need_new_client() {
+    if(clients.length < tunnel_num) {
+        return true;
+    }else {
+        for(let i = 0; i < tunnel_num; i++) {
+            if(clients[i]._state == 0) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 module.exports = {
     push_client,
-    get_noblock_client
+    get_noblock_client,
+    need_new_client
 }
