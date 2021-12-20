@@ -54,7 +54,7 @@ function new_client(mapper) {
                 return;
             }else if(cmd == "TLFIN") {
                 let ACK = mix(Buffer.from("TLACK"), -1, 0);
-                socket.write(ACK, () => {
+                client.write(ACK, () => {
                     setTimeout(() => {
                         client.destroy();
                     }, 1000 * config.time_wait_timeout);
