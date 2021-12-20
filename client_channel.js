@@ -65,7 +65,8 @@ function new_client(mapper) {
                 let ACK = mix(Buffer.from("TLFIN"), -1, 0);
                 client.write(ACK, () => {
                     let self_check = setInterval(() => {
-                        get_Q(client.remoteAddress, (a) => {
+                        console.log(client.localAddress);
+                        get_Q(client.localAddress, (a) => {
                             if(a == "0") {
                                 clearInterval(self_check);
                                 client.destroy();
