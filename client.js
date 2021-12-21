@@ -6,6 +6,7 @@ const send_data = require("./snd_buffer").push_data;
 const {local_port, local_host} = require("./config");
 const {init_compress} = require("./async_compress");
 const {k} = require("./async_compress");
+const {clients} = require("./clients_controller");
     
 
 let     mapper = {};
@@ -31,14 +32,17 @@ function check_dead_conn(mapper) {
 
 function show_mapper(mapper) {
     console.log("vvvvvvvvvvvvvvvvvvvvvvv");
-    for(let i in mapper) {
-        if(mapper[i] != undefined) {
-            console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
-        }
+    for(let i of clients) {
+        console.log(i.remotePort, i.localPort, i._state, i._auth_timer);
     }
-    console.log("真实数据大小", k.s);
-    console.log("压缩数据大小", k.m);
-    console.log("压缩率", (k.s - k.m) / k.s);
+    //for(let i in mapper) {
+        //if(mapper[i] != undefined) {
+            //console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
+        //}
+    //}
+    //console.log("真实数据大小", k.s);
+    //console.log("压缩数据大小", k.m);
+    //console.log("压缩率", (k.s - k.m) / k.s);
     console.log("^^^^^^^^^^^^^^^^^^^^^^^");
 }
 

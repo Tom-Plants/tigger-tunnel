@@ -68,5 +68,6 @@ function need_new_client() {
 module.exports = {
     push_client,
     get_noblock_client,
-    need_new_client
+    need_new_client,
+    clients
 }
