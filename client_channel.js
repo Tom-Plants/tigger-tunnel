@@ -23,6 +23,12 @@ function new_client(mapper) {
                 return undefined;
             }
         }, () => {
+
+            if(timer_mapper[client.localPort] != undefined) {
+                clearTimeout(timer_mapper[client.localPort]);
+                timer_mapper[client.localPort] = undefined;
+            }
+
             if(!push_client(client)) {
                 let ACK = mix(Buffer.from("TLFIN"), -1, 0);
                 client.write(ACK, () => {
@@ -40,17 +46,20 @@ function new_client(mapper) {
             client._state = 2;
             //发送客户端唯一标识
             client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
+                let count = 0;
                 let self_check = setInterval(() => {
                     get_Q(client.localPort, (a) => {
+                        count ++;
                         if(a == "0") {
                             clearInterval(self_check);
                             client._state = 1;
                             client.emit("drain");
-
-                            if(timer_mapper[client.localPort] != undefined) {
-                                clearTimeout(timer_mapper[client.localPort]);
-                                timer_mapper[client.localPort] = undefined;
-                            }
+                            return;
+                        }
+                        if(count >= 10) {
+                            clearInterval(self_check);
+                            client._state = 0;
+                            client.destroy();
                         }
                     })
                 }, 1000);
@@ -60,7 +69,6 @@ function new_client(mapper) {
             if(!socket.destroyed) {
                 socket.destroy();
             }
-            client._state = 0;
             timer_mapper[socket.localPort] = undefined;
         }, 1000 * 10);
         timer_mapper[socket.localPort] = timer;
