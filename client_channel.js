@@ -10,6 +10,8 @@ const config = require("./config");
 const mix = require("./mix_packet");
 const get_Q = require("./send_q_getter").get_port_send_Q;
 
+let timer_mapper = {};
+
 function new_client(mapper) {
     let client = tls.connect(
         {
@@ -44,10 +46,23 @@ function new_client(mapper) {
                             clearInterval(self_check);
                             client._state = 1;
                             client.emit("drain");
+
+                            if(timer_mapper[client.localPort] != undefined) {
+                                clearTimeout(timer_mapper[client.localPort]);
+                                timer_mapper[client.localPort] = undefined;
+                            }
                         }
                     })
                 }, 1000);
             });
+    }).on("connection", (socket) => {
+        let timer = setTimeout(() => {
+            if(!socket.destroyed) {
+                socket.destroy();
+            }
+            timer_mapper[socket.localPort] = undefined;
+        }, 1000 * 10);
+        timer_mapper[socket.localPort] = timer;
     });
 
     let lkdata = recv_handle((data) => {
