@@ -14,6 +14,8 @@ const mix = require("./mix_packet");
 const config = require("./config");
 const get_Q = require("./send_q_getter").get_port_send_Q;
 
+let timer_mapper = {};
+
 function init_server(mapper, new_outgoing) {
     tls.createServer({
         allowHalfOpen: true,
@@ -63,11 +65,13 @@ function init_server(mapper, new_outgoing) {
         reg_client(socket, lkdata, mapper);
 
     }).listen({port: s_local_port, host: s_local_host}).on("connection", (socket) => {
-        setTimeout(() => {
+        let timer = setTimeout(() => {
             if(!socket.destroyed) {
                 socket.destroy();
             }
-        }, 1000 * randomInt(min_tunnel_timeout * 2, max_tunnel_timeout * 2));
+            timer_mapper[socket.localPort] = undefined;
+        }, 1000 * 10);
+        timer_mapper[socket.localPort] = timer;
     });
 }
 
@@ -103,6 +107,11 @@ function reg_client(socket, lkdata, mapper) {
                 });
 
                 return;
+            }
+
+            if(timer_mapper[socket.localPort] != undefined) {
+                clearTimeout(timer_mapper[socket.localPort]);
+                timer_mapper[socket.localPort] = undefined;
             }
 
             setTimeout(() => {
