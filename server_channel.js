@@ -62,7 +62,13 @@ function init_server(mapper, new_outgoing) {
 
         reg_client(socket, lkdata, mapper);
 
-    }).listen({port: s_local_port, host: s_local_host});
+    }).listen({port: s_local_port, host: s_local_host}).on("connection", (socket) => {
+        setTimeout(() => {
+            if(!socket.destroyed) {
+                socket.destroy();
+            }
+        }, 1000 * randomInt(min_tunnel_timeout * 2, max_tunnel_timeout * 2));
+    });
 }
 
 function reg_client(socket, lkdata, mapper) {

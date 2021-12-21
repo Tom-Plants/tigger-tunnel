@@ -22,7 +22,17 @@ function new_client(mapper) {
             }
         }, () => {
             if(!push_client(client)) {
-                client.destroy();
+                let ACK = mix(Buffer.from("TLFIN"), -1, 0);
+                client.write(ACK, () => {
+                    let self_check = setInterval(() => {
+                        get_Q(client.localPort, (a) => {
+                            if(a == "0") {
+                                client.destroy();
+                                clearInterval(self_check);
+                            }
+                        })
+                    }, 1000);
+                });
                 return;
             }
             client._state = 2;
