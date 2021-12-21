@@ -5,6 +5,7 @@ const {init_server} = require("./server_channel");
 const send_data = require("./snd_buffer").push_data;
 const {s_target_host, s_target_port} = require("./config");
 const {init_compress} = require("./async_compress");
+const {clients} = require("./clients_controller");
 
 let     mapper = {};
 
@@ -30,10 +31,8 @@ function check_dead_conn(mapper) {
 function show_mapper(mapper) {
     return () => {
         console.log("vvvvvvvvvvvvvvvvvvvvvvv");
-        for(let i in mapper) {
-            if(mapper[i] != undefined) {
-                console.log(i, mapper[i].s.bytesWritten, mapper[i].s.bytesRead, "read:", mapper[i].s.isPaused(), "write", mapper[i]._paused);
-            }
+        for(let i of clients) {
+            console.log(i.remotePort, i.localPort, i._state, i._auth_timer);
         }
         console.log("^^^^^^^^^^^^^^^^^^^^^^^");
 
