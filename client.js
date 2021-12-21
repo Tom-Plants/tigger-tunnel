@@ -33,7 +33,7 @@ function check_dead_conn(mapper) {
 function show_mapper(mapper) {
     console.log("vvvvvvvvvvvvvvvvvvvvvvv");
     for(let i of clients) {
-        console.log(i.remotePort, i.localPort, i._state, i._auth_timer);
+        console.log(i.remotePort, i.localPort, i._state);
     }
     //for(let i in mapper) {
         //if(mapper[i] != undefined) {

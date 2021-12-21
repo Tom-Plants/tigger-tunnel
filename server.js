@@ -32,7 +32,7 @@ function show_mapper(mapper) {
     return () => {
         console.log("vvvvvvvvvvvvvvvvvvvvvvv");
         for(let i of clients) {
-            console.log(i.remotePort, i.localPort, i._state, i._auth_timer);
+            console.log(i.remotePort, i.localPort, i._state);
         }
         console.log("^^^^^^^^^^^^^^^^^^^^^^^");
 
