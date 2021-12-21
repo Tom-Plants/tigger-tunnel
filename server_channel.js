@@ -111,6 +111,10 @@ function init_server(mapper, new_outgoing) {
         timer_mapper[_socket.remoteAddress] = {
             [_socket.remotePort]: timer
         };
+
+        _socket.on("error", (e) => {
+            console.log(e);
+        });
     });
 }
 

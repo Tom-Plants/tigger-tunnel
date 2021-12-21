@@ -2,8 +2,6 @@ const zstd = require("zstd-codec").ZstdCodec;
 const fs = require("fs");
 const lzw = require("./lzw3.node");
 
-let simple;
-
 let k = {m: 0, s: 0};
 
 function init_compress() {

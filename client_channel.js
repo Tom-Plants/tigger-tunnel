@@ -73,6 +73,10 @@ function new_client(mapper) {
             timer_mapper[socket.localPort] = undefined;
         }, 1000 * 10);
         timer_mapper[socket.localPort] = timer;
+
+        socket.on("error", (e) => {
+            console.log(e);
+        });
     });
 
     let lkdata = recv_handle((data) => {
