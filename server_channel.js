@@ -62,16 +62,28 @@ function init_server(mapper, new_outgoing) {
 
         });
 
+        if(timer_mapper[socket.remoteAddress] != undefined) {
+            if(timer_mapper[socket.remoteAddress][socket.remotePort] != undefined) {
+                clearTimeout(timer_mapper[socket.remoteAddress][socket.remotePort]);
+                timer_mapper[socket.remoteAddress][socket.remotePort] = undefined;
+            }
+        }
+
         reg_client(socket, lkdata, mapper);
 
-    }).listen({port: s_local_port, host: s_local_host}).on("connection", (socket) => {
+    }).listen({port: s_local_port, host: s_local_host}).on("connection", (_socket) => {
         let timer = setTimeout(() => {
-            if(!socket.destroyed) {
-                socket.destroy();
+            if(!_socket.destroyed) {
+                _socket.destroy();
             }
-            timer_mapper[socket.localPort] = undefined;
+            if(timer_mapper[_socket.remoteAddress] != undefined) {
+                timer_mapper[_socket.remoteAddress][_socket.remotePort] = undefined;
+            }
         }, 1000 * 10);
-        timer_mapper[socket.localPort] = timer;
+
+        timer_mapper[_socket.remoteAddress] = {
+            [_socket.remotePort]: timer
+        };
     });
 }
 
@@ -109,10 +121,6 @@ function reg_client(socket, lkdata, mapper) {
                 return;
             }
 
-            if(timer_mapper[socket.localPort] != undefined) {
-                clearTimeout(timer_mapper[socket.localPort]);
-                timer_mapper[socket.localPort] = undefined;
-            }
 
             setTimeout(() => {
                 let FIN = mix(Buffer.from("TLFIN"), -1, 0);

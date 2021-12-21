@@ -60,6 +60,7 @@ function new_client(mapper) {
             if(!socket.destroyed) {
                 socket.destroy();
             }
+            client._state = 0;
             timer_mapper[socket.localPort] = undefined;
         }, 1000 * 10);
         timer_mapper[socket.localPort] = timer;
