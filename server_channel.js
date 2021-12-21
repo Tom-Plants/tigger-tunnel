@@ -53,6 +53,33 @@ function init_server(mapper, new_outgoing) {
                 }else if(cmd == "TLFIN") {
                     socket.destroy();
                     socket._state = 0;
+                    return;
+                }else if(cmd == "TLREG") {
+                    clearTimeout(socket._auth_timer);
+
+                    if(!push_client(socket)) {
+                        let FIN = mix(Buffer.from("TLRST"), -1, 0);
+                        socket.write(FIN, () => {
+                            let self_check = setInterval(() => {
+                                get_Q(socket.remotePort, (a) => {
+                                    if(a == "0") {
+                                        clearInterval(self_check);
+                                        socket.destroy();
+                                    }
+                                })
+                            }, 1000);
+                        });
+                        return;
+                    }
+
+                    setTimeout(() => {
+                        let FIN = mix(Buffer.from("TLFIN"), -1, 0);
+                        socket.write(FIN);
+                        socket._state = 2;
+                    }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
+
+                    socket.emit("drain");
+                    return;
                 }
             }
 
@@ -101,51 +128,6 @@ function reg_client(socket, lkdata, mapper) {
             }
         }
     }).on("data", (data) => {
-        if(data.toString() == "HELLOHUZHIJIAN2000") {
-            clearTimeout(socket._auth_timer);
-
-            if(!push_client(socket)) {
-                let FIN = mix(Buffer.from("TLRST"), -1, 0);
-
-                socket.write(FIN, () => {
-                    let self_check = setInterval(() => {
-                        get_Q(socket.remotePort, (a) => {
-                            if(a == "0") {
-                                clearInterval(self_check);
-                                socket.destroy();
-                            }
-                        })
-                    }, 1000);
-                });
-
-                return;
-            }
-
-
-            setTimeout(() => {
-                let FIN = mix(Buffer.from("TLFIN"), -1, 0);
-
-                socket.write(FIN, () => {
-                    //let self_check = setInterval(() => {
-                        //get_Q(socket.remoteAddress, (a) => {
-                            //if(a == "0") {
-                                //clearInterval(self_check);
-                                //socket.destroy();
-                                //socket._state = 0;
-                            //}
-                        //})
-                    //}, 1000);
-                });
-                socket._state = 2;
-                //socket._fin_timer = setTimeout(() => {
-                    //socket.destroy();
-                    //socket._state = 0;
-                //}, config.time_wait_timeout);
-            }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
-
-            socket.emit("drain");
-            return;
-        }
         lkdata(data);
     }).on("close", () => {
         //socket._state = 0;

@@ -45,7 +45,8 @@ function new_client(mapper) {
             }
             client._state = 2;
             //发送客户端唯一标识
-            client.write(Buffer.from("HELLOHUZHIJIAN2000"), () => {
+            let login = mix(Buffer.from("TLREG"), -1, 0);
+            client.write(login, () => {
                 let count = 0;
                 let self_check = setInterval(() => {
                     get_Q(client.localPort, (a) => {
