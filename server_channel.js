@@ -51,8 +51,8 @@ function init_server(mapper, new_outgoing) {
                     }
                     return;
                 }else if(cmd == "TLFIN") {
-                    socket.destroy();
                     socket._state = 0;
+                    socket.destroy();
                     return;
                 }else if(cmd == "TLREG") {
                     clearTimeout(socket._auth_timer);
