@@ -17,7 +17,7 @@ function new_client(mapper) {
         {
             host: target_host,
             port: target_port,
-            allowHalfOpen: true,
+            //allowHalfOpen: true,
             ca: fs.readFileSync("./certificate.pem"),
             checkServerIdentity: (host, cert) => {
                 return undefined;
@@ -129,11 +129,7 @@ function new_client(mapper) {
     }).on("data", (data) => {
         lkdata(data);
     }).on("close", () => {
-        //client._state = 0;
         client._state = 0;
-    }).on("end", () => {
-        client._state = 2;
-        client.end();
     }).setKeepAlive(true, 1000 * 30);
 }
 

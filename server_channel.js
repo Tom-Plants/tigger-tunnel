@@ -18,7 +18,6 @@ let timer_mapper = {};
 
 function init_server(mapper, new_outgoing) {
     tls.createServer({
-        allowHalfOpen: true,
         cert: fs.readFileSync("./certificate.pem"),
         key: fs.readFileSync("./key.pem")
     }, (socket) => {
@@ -60,7 +59,7 @@ function init_server(mapper, new_outgoing) {
 
                     setTimeout(() => {
                         socket.end();
-                        socket._state = 2;
+                        socket._state = 0;
                     }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
 
                     socket.emit("drain");
@@ -117,9 +116,6 @@ function reg_client(socket, lkdata, mapper) {
         lkdata(data);
     }).on("close", () => {
         socket._state = 0;
-    }).on("end", () => {
-        socket._state = 2;
-        socket.end();
     }).setKeepAlive(true, 1000 * 20);
 
     socket._auth_timer = setTimeout(() => {
