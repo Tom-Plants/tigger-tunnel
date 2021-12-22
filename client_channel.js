@@ -74,8 +74,8 @@ function new_client(mapper) {
         }, 1000 * 10);
         timer_mapper[socket.localPort] = timer;
 
-        socket.on("error", (e) => {
-            console.log(e);
+        socket.on("error", (err) => {
+            console.log("normal", err);
         });
     });
 
@@ -100,23 +100,6 @@ function new_client(mapper) {
                     mapper[num] = undefined;
                 }
                 return;
-            }else if(cmd == "TLFIN") {
-                let ACK = mix(Buffer.from("TLFIN"), -1, 0);
-                client.write(ACK, () => {
-                    let self_check = setInterval(() => {
-                        get_Q(client.localPort, (a) => {
-                            if(a == "0") {
-                                clearInterval(self_check);
-                                client.destroy();
-                                client._state = 0;
-                            }
-                        })
-                    }, 1000);
-                });
-                client._state = 2;
-            }else if(cmd == "TLRST") {
-                client.destroy();
-                client._state = 0;
             }
         }
         
@@ -132,6 +115,7 @@ function new_client(mapper) {
     
     client.on("error", (e) => {
         console.log(e);
+        client._state = 0;
     }).on("drain", () => {
         client._paused = false;
         let s_rtn = clear_data();
@@ -146,9 +130,10 @@ function new_client(mapper) {
         lkdata(data);
     }).on("close", () => {
         //client._state = 0;
+        client._state = 0;
     }).on("end", () => {
-        //client.end();
-        //client._state = 0;
+        client._state = 2;
+        client.end();
     }).setKeepAlive(true, 1000 * 30);
 }
 

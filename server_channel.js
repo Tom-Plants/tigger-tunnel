@@ -50,31 +50,17 @@ function init_server(mapper, new_outgoing) {
                         mapper[num] = undefined;
                     }
                     return;
-                }else if(cmd == "TLFIN") {
-                    socket._state = 0;
-                    socket.destroy();
-                    return;
                 }else if(cmd == "TLREG") {
                     clearTimeout(socket._auth_timer);
 
                     if(!push_client(socket)) {
-                        let FIN = mix(Buffer.from("TLRST"), -1, 0);
-                        socket.write(FIN, () => {
-                            let self_check = setInterval(() => {
-                                get_Q(socket.remotePort, (a) => {
-                                    if(a == "0") {
-                                        clearInterval(self_check);
-                                        socket.destroy();
-                                    }
-                                })
-                            }, 1000);
-                        });
+                        socket.end();
+                        socket._state = 2;
                         return;
                     }
 
                     setTimeout(() => {
-                        let FIN = mix(Buffer.from("TLFIN"), -1, 0);
-                        socket.write(FIN);
+                        socket.end();
                         socket._state = 2;
                     }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
 
@@ -111,16 +97,13 @@ function init_server(mapper, new_outgoing) {
         timer_mapper[_socket.remoteAddress] = {
             [_socket.remotePort]: timer
         };
-
-        _socket.on("error", (e) => {
-            console.log(e);
-        });
     });
 }
 
 function reg_client(socket, lkdata, mapper) {
     socket.on("error", (e) => {
         console.log(e);
+        socket._state = 0;
     }).on("drain", () => {
         socket._paused = false;
         let s_rtn = clear_data();
@@ -134,17 +117,16 @@ function reg_client(socket, lkdata, mapper) {
     }).on("data", (data) => {
         lkdata(data);
     }).on("close", () => {
-        //socket._state = 0;
+        socket._state = 0;
     }).on("end", () => {
-        //socket.end();
-        //socket._state = 0;
+        socket._state = 2;
+        socket.end();
     }).setKeepAlive(true, 1000 * 20);
 
     socket._auth_timer = setTimeout(() => {
-        socket.destroy();
+        socket._state = 2;
+        socket.end();
     }, 1000 * 10);
-
-
 }
 
 module.exports = {
