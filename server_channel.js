@@ -57,6 +57,9 @@ function init_server(mapper, new_outgoing) {
                         return;
                     }
 
+                    let ack = mix(Buffer.from("TLREG"), -1, 0);
+                    socket.write(ack);
+
                     setTimeout(() => {
                         let login = mix(Buffer.from("TLEND"), -1, 0);
                         socket.write(login);

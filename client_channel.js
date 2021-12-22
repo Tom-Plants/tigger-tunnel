@@ -29,54 +29,9 @@ function new_client(mapper) {
                 timer_mapper[client.localPort] = undefined;
             }
 
-            if(!push_client(client)) {
-                let ACK = mix(Buffer.from("TLFIN"), -1, 0);
-                client.write(ACK, () => {
-                    let self_check = setInterval(() => {
-                        get_Q(client.localPort, (a) => {
-                            if(a == "0") {
-                                client.destroy();
-                                clearInterval(self_check);
-                            }
-                        })
-                    }, 1000);
-                });
-                return;
-            }
-            client._state = 2;
             //发送客户端唯一标识
             let login = mix(Buffer.from("TLREG"), -1, 0);
-            client.write(login, () => {
-                let count = 0;
-                let self_check = setInterval(() => {
-                    get_Q(client.localPort, (a) => {
-                        count ++;
-                        if(a == "0") {
-                            clearInterval(self_check);
-                            client._state = 1;
-                            client.emit("drain");
-                            return;
-                        }
-                        if(count >= 10) {
-                            clearInterval(self_check);
-                            client._state = 0;
-                            client.destroy();
-                        }
-                    })
-                }, 1000);
-            });
-    }).on("connection", (socket) => {
-        let timer = setTimeout(() => {
-            if(!socket.destroyed) {
-                socket.destroy();
-            }
-            timer_mapper[socket.localPort] = undefined;
-        }, 1000 * 10);
-        timer_mapper[socket.localPort] = timer;
-
-        socket.on("error", (err) => {
-            console.log("normal", err);
-        });
+            client.write(login);
     });
 
     let lkdata = recv_handle((data) => {
@@ -102,6 +57,11 @@ function new_client(mapper) {
                 return;
             }else if(cmd == "TLEND") {
                 client._state = 0;
+                return;
+            }else if(cmd == "TLREG") {
+                if(!push_client(client)) {
+                    socket.destroy();
+                }
                 return;
             }
         }
