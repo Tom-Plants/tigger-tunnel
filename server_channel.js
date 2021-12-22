@@ -54,8 +54,7 @@ function init_server(mapper, new_outgoing) {
                     clearTimeout(socket._auth_timer);
 
                     if(!push_client(socket)) {
-                        socket.end();
-                        socket._state = 2;
+                        socket.destroy();
                         return;
                     }
 
