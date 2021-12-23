@@ -70,6 +70,7 @@ function new_client(mapper) {
             }else {
                 let cmd = real_data.toString();
                 if(cmd == "PTSYN") {
+                    console.log(num);
                     if(mapper[num] != undefined) {
                         mapper[num].sh.sync(pkt_num);
                     }

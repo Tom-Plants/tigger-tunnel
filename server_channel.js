@@ -76,7 +76,8 @@ function init_server(mapper, new_outgoing) {
                     }
                 }else {
                     let cmd = real_data.toString();
-                    if(cmd == "PTSYN") {
+                    if(cmd == "PTSYN") {    
+                        console.log(num);
                         if(mapper[num] != undefined) {
                             mapper[num].sh.sync(pkt_num);
                         }
