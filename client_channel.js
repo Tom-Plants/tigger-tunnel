@@ -18,10 +18,8 @@ function new_client(mapper) {
             host: target_host,
             port: target_port,
             //allowHalfOpen: true,
-            ca: fs.readFileSync("./certificate.pem"),
-            checkServerIdentity: (host, cert) => {
-                return undefined;
-            }
+            //ca: fs.readFileSync("./certificate.pem"),
+            
         }, () => {
 
             if(timer_mapper[client.localPort] != undefined) {
