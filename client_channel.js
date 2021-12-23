@@ -56,9 +56,6 @@ function new_client(mapper) {
                         mapper[num] = undefined;
                     }
                     return;
-                }else if(cmd == "TLEND") {
-                    client._state = 0;
-                    return;
                 }else if(cmd == "TLREG") {
                     if(!push_client(client)) {
                         client.destroy();

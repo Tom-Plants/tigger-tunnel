@@ -64,12 +64,14 @@ function init_server(mapper, new_outgoing) {
                         socket.write(ack);
 
                         setTimeout(() => {
-                            let login = mix(Buffer.from("TLEND"), -1, 0);
-                            socket.write(login);
-                            setTimeout(() => {
-                                socket.end();
-                                socket._state = 0;
-                            }, 1000 * 10);
+                            socket.end();
+                            socket._state = 0;
+                            //let login = mix(Buffer.from("TLEND"), -1, 0);
+                            //socket.write(login);
+                            //setTimeout(() => {
+                                //socket.end();
+                                //socket._state = 0;
+                            //}, 1000 * 10);
                         }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
 
                         socket.emit("drain");
