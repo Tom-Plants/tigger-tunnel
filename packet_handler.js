@@ -31,7 +31,7 @@ function pk_handle(callback, referPort) {
         }
         data_sync_timer = setTimeout(() => {
             //发送接收到的包的指针
-            console.log(recv_count, "同步");
+            console.log(rp, recv_count, "同步");
             push_data(Buffer.from("PTSYN"), recv_count, rp);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
 
             data_sync_timer = undefined;
@@ -66,7 +66,7 @@ function st_handle(referPort) {
                     return;
                 }
                 //发送接收到的包的指针
-                console.log("发现", synced_send_count + 1, "-", send_count  , "需要重传");
+                console.log("发现", rp, "的", synced_send_count + 1, "-", send_count  , "需要重传");
 
                 let _send_count = synced_send_count + 1;
                 while(true) {

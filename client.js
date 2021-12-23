@@ -15,7 +15,7 @@ init_local_server();
 
 setInterval(() => {
     init_clients(mapper);
-    show_mapper(mapper);
+    //show_mapper(mapper);
 }, 1000);
 
 setInterval(() => {
