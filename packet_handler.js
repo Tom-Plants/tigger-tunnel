@@ -32,7 +32,7 @@ function pk_handle(callback, referPort) {
         data_sync_timer = setTimeout(() => {
             //发送接收到的包的指针
             console.log(rp, recv_count, "同步");
-            push_data(Buffer.from("PTSYN"), recv_count, rp);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+            push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
 
             data_sync_timer = undefined;
         }, 500);
