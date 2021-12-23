@@ -71,7 +71,7 @@ function need_new_client() {
         if(clients[i]._state == 0) {
             return true;
         }
-        if(client[i].remotePort == undefined) {
+        if(clients[i].remotePort == undefined) {
             return true;
         }
         if(clients[i].localPort == undefined) {
