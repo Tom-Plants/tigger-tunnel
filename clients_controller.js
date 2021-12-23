@@ -27,6 +27,14 @@ function push_client(client) {
             clients[i] = client;
             return true;
         }
+        if(clients[i].remotePort == undefined) {
+            clients[i].destroy();
+            return true;
+        }
+        if(clients[i].localPort == undefined) {
+            clients[i].destroy();
+            return true;
+        }
     }
     return false;
 }
@@ -40,7 +48,9 @@ function get_noblock_client() {
     while(true) {
         if(clients[num] != undefined &&
             clients[num]._paused == false &&
-            clients[num]._state == 1) {
+            clients[num]._state == 1 &&
+            clients[num].remotePort != undefined &&
+            clients[num].localPort != undefined) {
             client_pointer = num;
             if((++client_pointer) == tunnel_num) {
                 client_pointer = 0;
@@ -59,6 +69,12 @@ function need_new_client() {
             return true;
         }
         if(clients[i]._state == 0) {
+            return true;
+        }
+        if(client[i].remotePort == undefined) {
+            return true;
+        }
+        if(clients[i].localPort == undefined) {
             return true;
         }
     }
