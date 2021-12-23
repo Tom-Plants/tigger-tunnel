@@ -80,8 +80,10 @@ function st_handle(referPort) {
                     }
 
                     if(paused == false) {
-                        if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
-                            paused = true;
+                        if(cached_buffer[_send_count] != undefined) {
+                            if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                                paused = true;
+                            }
                         }
                     }else {
                         console.log("通道正忙");
