@@ -127,6 +127,7 @@ function reg_client(socket, lkdata, mapper) {
         if(s_rtn == true) {
             for(let i in mapper) {
                 if(mapper[i] != undefined) {
+                    mapper[j].sh.drain();
                     if(mapper[i]._paused == false) mapper[i].s.resume();
                 }
             }

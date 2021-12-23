@@ -47,6 +47,7 @@ function st_handle(referPort) {
     cached_buffer.length = 32767;
     let sended_cache_point = 0; //被它指到的单元还没释放
     let rp = referPort;
+    let paused = false;
     return {
         send: (data) => {
             if(send_count == 32767) {
@@ -79,7 +80,13 @@ function st_handle(referPort) {
                         break;
                     }
 
-                    push_data(cached_buffer[_send_count], rp, _send_count);
+                    if(paused == false) {
+                        if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                            paused = true;
+                        }
+                    }else {
+                        console.log("通道正忙");
+                    }
                     _send_count++;
                 }
             }, 3000);
@@ -115,6 +122,9 @@ function st_handle(referPort) {
                 clearInterval(data_sync_timer);
                 data_sync_timer = undefined;
             }
+        },
+        drain: () => {
+            paused = false;
         }
     }
 }

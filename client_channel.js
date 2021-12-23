@@ -97,6 +97,7 @@ function new_client(mapper) {
         if(s_rtn == true) {
             for(let j in mapper) {
                 if(mapper[j] != undefined) {
+                    mapper[j].sh.drain();
                     if(mapper[j]._paused == false) mapper[j].s.resume();
                 }
             }
