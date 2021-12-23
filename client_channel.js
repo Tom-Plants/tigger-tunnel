@@ -39,31 +39,43 @@ function new_client(mapper) {
         let num = data.readUInt16LE(2);
         let real_data = data.slice(4);
 
-        if(real_data.length == 5 && pkt_num == -1) {
-            let cmd = real_data.toString();
+        if(real_data.length == 5) {
+            
+            if(pkt_num == -1) {
+                let cmd = real_data.toString();
 
-            if(cmd == "PTCHK") {
-                if(mapper[num] == undefined) {
-                    send_data(Buffer.from("PFCLS"), num, -1);
+                if(cmd == "PTCHK") {
+                    if(mapper[num] == undefined) {
+                        send_data(Buffer.from("PFCLS"), num, -1);
+                    }
+                    return;
+                }else if(cmd == "PFCLS") {
+                    if(mapper[num] != undefined) {
+                        mapper[num].sh.clean();
+                        mapper[num].s.destroy();
+                        mapper[num].rh = undefined;
+                        mapper[num].sh = undefined;
+                        mapper[num] = undefined;
+                    }
+                    return;
+                }else if(cmd == "TLEND") {
+                    client._state = 0;
+                    return;
+                }else if(cmd == "TLREG") {
+                    if(!push_client(client)) {
+                        socket.destroy();
+                    }
+                    return;
                 }
-                return;
-            }else if(cmd == "PFCLS") {
-                if(mapper[num] != undefined) {
-                    mapper[num].sh.clean();
-                    mapper[num].s.destroy();
-                    mapper[num].rh = undefined;
-                    mapper[num].sh = undefined;
-                    mapper[num] = undefined;
+            }else {
+                let cmd = real_data.toString();
+                if(cmd == "PTSYN") {
+                    console.log("接收到PTSYN的包", pkt_num, num);
+                    if(mapper[num] != undefined) {
+                        mapper[num].sh.sync(pkt_num);
+                    }
+                    return;
                 }
-                return;
-            }else if(cmd == "TLEND") {
-                client._state = 0;
-                return;
-            }else if(cmd == "TLREG") {
-                if(!push_client(client)) {
-                    socket.destroy();
-                }
-                return;
             }
         }
         

@@ -1,4 +1,4 @@
-const push_data = require("./snd_buffer").push_data;
+const {push_data} = require("./snd_buffer");
 
 function pk_handle(callback, referPort) {
     let cb = callback;
