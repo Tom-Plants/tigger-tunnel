@@ -52,7 +52,7 @@ function get_noblock_client() {
             clients[num].remotePort != undefined &&
             clients[num].localPort != undefined) {
             client_pointer = num;
-            if((++client_pointer) == tunnel_num) {
+            if((client_pointer) == tunnel_num) {
                 client_pointer = 0;
             }
             return clients[num];
