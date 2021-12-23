@@ -103,6 +103,7 @@ function st_handle(referPort) {
                     break;
                 }
 
+                console.log(rp, sended_cache_point, "被清空了");
                 cached_buffer[sended_cache_point] = undefined;
 
                 sended_cache_point++;
