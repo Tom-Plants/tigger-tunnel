@@ -70,7 +70,6 @@ function new_client(mapper) {
             }else {
                 let cmd = real_data.toString();
                 if(cmd == "PTSYN") {
-                    console.log("接收到PTSYN的包", pkt_num, num);
                     if(mapper[num] != undefined) {
                         mapper[num].sh.sync(pkt_num);
                     }

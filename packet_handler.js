@@ -93,6 +93,7 @@ function st_handle(referPort) {
             }
         },
         sync: (count) => {
+            console.log("接收到PTSYN的包", rp, count);
             synced_send_count = count;  //同步已经发送的单元
 
             while(true) {
