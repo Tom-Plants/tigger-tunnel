@@ -81,7 +81,7 @@ function st_handle(referPort) {
                     }
                     _send_count++;
                 }
-            }, 3000);
+            }, 10000);
 
             return send_count++;
         },
