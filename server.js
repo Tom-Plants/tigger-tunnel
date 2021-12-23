@@ -14,7 +14,7 @@ let     mapper = {};
     await init_compress();
 })();
 
-setInterval(show_mapper(mapper), 1000);
+//setInterval(show_mapper(mapper), 1000);
 
 setInterval(() => {
     check_dead_conn(mapper);
