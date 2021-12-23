@@ -54,7 +54,6 @@ function st_handle(referPort) {
                 send_count = 0;
             }
 
-            console.log("<<in cached", send_count, rp, data.length);
             cached_buffer[send_count] = data;
 
             if(data_sync_timer != undefined) {
@@ -112,7 +111,6 @@ function st_handle(referPort) {
                     break;
                 }
 
-                console.log(rp, sended_cache_point, "被清空了");
                 cached_buffer[sended_cache_point] = undefined;
 
                 sended_cache_point++;
