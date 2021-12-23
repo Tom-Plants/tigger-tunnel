@@ -48,22 +48,22 @@ function new_outgoing(num) {
 
     mapper[num] = {
         s:conn,
-        sh: st(),
+        sh: st(num),
         rh: ph(data_recive, num),
         _paused: false
     };
 
     conn.on("connect", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh();
+        let cur = mapper[num].sh.send(Buffer.from("PTCTN"));
         send_data(Buffer.from("PTCTN"), num, cur);
     }).on("end", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh();
+        let cur = mapper[num].sh.send(Buffer.from("CHALF"));
         send_data(Buffer.from("SHALF"), num, cur);
     }).on("data", (data) => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh();
+        let cur = mapper[num].sh.send(data);
         if((send_data(data, num, cur)) == false) {
             Object.keys(mapper).map((value) => {
                 if(mapper[value] != undefined) {
@@ -73,9 +73,10 @@ function new_outgoing(num) {
         }
     }).on("close", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh();
+        let cur = mapper[num].sh.send(Buffer.from("PTCLS"));
         send_data(Buffer.from("PTCLS"), num, cur);
         if(mapper[num] != undefined) {
+            mapper[num].sh.clean();
             mapper[num].s.destroy();
             mapper[num].rh = undefined;
             mapper[num].sh = undefined;
@@ -87,7 +88,7 @@ function new_outgoing(num) {
     })
     .on("drain", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh();
+        let cur = mapper[num].sh.send(Buffer.from("PTCTN"));
         send_data(Buffer.from("PTCTN"), num, cur);
     }).setKeepAlive(true, 200);
 }
@@ -98,6 +99,7 @@ function data_recive(data, referPort, pkt) {
         if(data.length == 5) {
             let cmd = data.toString();
             if(cmd == "PTCLS") {
+                mapper[referPort].sh.clean();
                 mapper[referPort].s.destroy();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;
@@ -114,11 +116,14 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort]._paused = true;
                 mapper[referPort].s.pause();
                 return;
+            }else if(cmd == "PTSYN") {
+                mapper[referPort].sh.sync(pkt);
+                return;
             }
         }
 
         if(mapper[referPort].s.write(data) == false) {
-            let cur = mapper[referPort].sh();
+            let cur = mapper[referPort].sh.send(Buffer.from("PTSTP"));
             send_data(Buffer.from("PTSTP"), referPort, cur);
         }
     }

@@ -43,6 +43,7 @@ function init_server(mapper, new_outgoing) {
                     return;
                 }else if(cmd == "PFCLS") {
                     if(mapper[num] != undefined) {
+                        mapper[num].sh.clean();
                         mapper[num].s.destroy();
                         mapper[num].rh = undefined;
                         mapper[num].sh = undefined;
