@@ -49,7 +49,7 @@ function new_outgoing(num) {
     mapper[num] = {
         s:conn,
         sh: st(num),
-        rh: ph(data_recive, num),
+        rh: ph(data_recive, num, mapper),
         _paused: false
     };
 

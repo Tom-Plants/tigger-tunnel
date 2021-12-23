@@ -1,10 +1,11 @@
 const {push_data} = require("./snd_buffer");
 
-function pk_handle(callback, referPort) {
+function pk_handle(callback, referPort, mapper) {
     let cb = callback;
     let recv_count = 0;
     let buffer = {};
     let rp = referPort;
+    let m = mapper;
     
     //延时通知对端已接受的包号
     let data_sync_timer = undefined;
@@ -23,6 +24,11 @@ function pk_handle(callback, referPort) {
             }
         }else {
             buffer[pkt_num] = data;
+        }
+
+        if(m[rp] == undefined) {
+            push_data(Buffer.from("PFCLS"), 0, -1);
+            return;
         }
 
         if(data_sync_timer != undefined) {

@@ -58,7 +58,7 @@ async function init_local_server() {
             return;
         }
         //注意释放
-        mapper[referPort] = {s:socket, sh:st(referPort), rh:ph(data_recive, referPort), _paused: false};
+        mapper[referPort] = {s:socket, sh:st(referPort), rh:ph(data_recive, referPort, mapper), _paused: false};
 
         socket.on("close", () => {
             if(mapper[referPort] == undefined) { return };
