@@ -73,17 +73,17 @@ function init_server(mapper, new_outgoing) {
 
                         socket.emit("drain");
                         return;
-                    }else {
-                        let cmd = real_data.toString();
-                        if(cmd == "PTSYN") {
-                            if(mapper[num] != undefined) {
-                                mapper[num].sh.sync(pkt_num);
-                            }
-                            return;
-                        }
                     }
-
+                }else {
+                    let cmd = real_data.toString();
+                    if(cmd == "PTSYN") {
+                        if(mapper[num] != undefined) {
+                            mapper[num].sh.sync(pkt_num);
+                        }
+                        return;
+                    }
                 }
+
             }
 
             if(mapper[num] != undefined) {
