@@ -90,6 +90,13 @@ function st_handle(referPort) {
                             if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
                                 paused = true;
                             }
+                        }else {
+                            console.log("检测到无法传输的数据，关闭定时器");
+                            if(data_sync_timer != undefined) {
+                                clearInterval(data_sync_timer);
+                                data_sync_timer = undefined;
+                            }
+
                         }
                     }else {
                         console.log("通道正忙");
