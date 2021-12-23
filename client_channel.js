@@ -63,7 +63,7 @@ function new_client(mapper) {
                     return;
                 }else if(cmd == "TLREG") {
                     if(!push_client(client)) {
-                        socket.destroy();
+                        client.destroy();
                     }
                     return;
                 }

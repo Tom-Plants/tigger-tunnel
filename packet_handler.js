@@ -82,7 +82,7 @@ function st_handle(referPort) {
                     push_data(cached_buffer[_send_count], rp, _send_count);
                     _send_count++;
                 }
-            }, 10000);
+            }, 3000);
 
             return send_count++;
         },
