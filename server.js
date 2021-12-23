@@ -117,6 +117,7 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].s.pause();
                 return;
             }else if(cmd == "PTSYN") {
+                console.log("接收到PTSYN的包", pkt, referPort);
                 mapper[referPort].sh.sync(pkt);
                 return;
             }
