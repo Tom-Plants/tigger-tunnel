@@ -53,6 +53,7 @@ function st_handle(referPort) {
                 send_count = 0;
             }
 
+            console.log("<<in cached", send_count, data);
             cached_buffer[send_count] = data;
 
             if(data_sync_timer != undefined) {
