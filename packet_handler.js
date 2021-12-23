@@ -75,11 +75,11 @@ function st_handle(referPort) {
                         _send_count = 0;
                     }
 
-                    push_data(cached_buffer[_send_count], rp, _send_count);
-
                     if(_send_count == send_count) {
                         break;
                     }
+
+                    push_data(cached_buffer[_send_count], rp, _send_count);
                     _send_count++;
                 }
             }, 10000);
