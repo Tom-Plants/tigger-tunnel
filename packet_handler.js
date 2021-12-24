@@ -34,12 +34,15 @@ function pk_handle(callback, referPort, mapper) {
 
                 data_sync_timer = undefined;
             }, 100);
-            }else {
-                if(pkt_num < recv_count || (pkt_num-recv_count) > 10000) {
-                } else { buffer[pkt_num] = data; }
-            }
+        }else {
+            if(pkt_num < recv_count || (pkt_num-recv_count) > 10000) {
+            } else { buffer[pkt_num] = data; }
+        }
+
+        console.log("接收到包", rp, recv_count);
 
         if(m[rp] == undefined) {
+            console.log("强制关闭");
             push_data(Buffer.from("PFCLS"), 0, -1);
             return;
         }
