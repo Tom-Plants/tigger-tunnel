@@ -11,6 +11,7 @@ function pk_handle(callback, referPort, mapper) {
     let data_sync_timer = undefined;
     return (pkt_num, data) => {
         if(pkt_num == recv_count) {
+            console.log("接收到包", rp, recv_count, pkt_num);
             cb(data, rp, recv_count);
             while(true) {
                 recv_count ++;
@@ -39,7 +40,6 @@ function pk_handle(callback, referPort, mapper) {
             } else { buffer[pkt_num] = data; }
         }
 
-        console.log("接收到包", rp, recv_count, pkt_num);
 
         if(m[rp] == undefined) {
             console.log("强制关闭");
