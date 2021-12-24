@@ -39,7 +39,7 @@ function pk_handle(callback, referPort, mapper) {
             } else { buffer[pkt_num] = data; }
         }
 
-        console.log("接收到包", rp, recv_count);
+        console.log("接收到包", rp, recv_count, pkt_num);
 
         if(m[rp] == undefined) {
             console.log("强制关闭");
@@ -92,6 +92,7 @@ function st_handle(referPort) {
 
                     if(paused == false) {
                         if(cached_buffer[_send_count] != undefined) {
+                            console.log(_send_count);
                             if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
                                 paused = true;
                             }
