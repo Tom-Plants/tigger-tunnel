@@ -36,6 +36,7 @@ function pk_handle(callback, referPort, mapper) {
 
                 data_sync_timer = undefined;
             }, 100);
+            recv_count++;
         }else {
             if(pkt_num < recv_count || (pkt_num-recv_count) > 10000) {
             } else { buffer[pkt_num] = data; }
