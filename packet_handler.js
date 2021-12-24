@@ -19,6 +19,7 @@ function pk_handle(callback, referPort, mapper) {
                     recv_count = 0
                 }
                 if(buffer[recv_count] != undefined) {
+                    console.log("接收到包", rp, recv_count, pkt_num);
                     cb(buffer[recv_count], rp, recv_count);
                     buffer[recv_count] = undefined;
                 }else break;
