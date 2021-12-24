@@ -136,10 +136,6 @@ function st_handle(referPort) {
                 sended_cache_point++;
             }
 
-            if(data_sync_timer != undefined) {
-                clearInterval(data_sync_timer);
-                data_sync_timer = undefined;
-            }
         },
         drain: () => {
             paused = false;
