@@ -32,7 +32,7 @@ function pk_handle(callback, referPort, mapper) {
             data_sync_timer = setTimeout(() => {
                 //发送接收到的包的指针
                 console.log(rp, recv_count, "同步");
-                push_data(Buffer.from("PTSYN"), rp, recv_count++);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
 
                 data_sync_timer = undefined;
             }, 100);
@@ -79,9 +79,9 @@ function st_handle(referPort) {
                     return;
                 }
                 //发送接收到的包的指针
-                console.log("发现", rp, "的", synced_send_count + 1, "-", send_count  , "需要重传");
+                console.log("发现", rp, "的", synced_send_count, "-", send_count  , "需要重传");
 
-                let _send_count = synced_send_count + 1;
+                let _send_count = synced_send_count;
                 while(true) {
                     if(_send_count == 32767) {
                         _send_count = 0;
