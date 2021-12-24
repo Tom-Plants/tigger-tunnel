@@ -33,7 +33,7 @@ function pk_handle(callback, referPort, mapper) {
                 push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
 
                 data_sync_timer = undefined;
-            }, 50);
+            }, 100);
             }else {
                 if(pkt_num < recv_count || (pkt_num-recv_count) > 10000) {
                 } else { buffer[pkt_num] = data; }
@@ -71,7 +71,7 @@ function st_handle(referPort) {
 
             data_sync_timer = setInterval(() => {
                 if(synced_send_count == send_count) {
-                    console.log("不需要重传");
+                    //console.log("不需要重传");
                     return;
                 }
                 //发送接收到的包的指针
@@ -101,11 +101,11 @@ function st_handle(referPort) {
 
                         }
                     }else {
-                        console.log("通道正忙");
+                        //console.log("通道正忙");
                     }
                     _send_count++;
                 }
-            }, 500);
+            }, 1000 * 10);
 
             return send_count++;
         },
@@ -117,7 +117,7 @@ function st_handle(referPort) {
         },
         sync: (count) => {
             if(count < synced_send_count || (count-synced_send_count) > 10000) {
-                console.log("出现异样");
+                //console.log("出现异样");
                 return;
             }
 
