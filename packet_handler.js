@@ -87,7 +87,6 @@ function st_handle(referPort) {
                         break;
                     }
 
-                    console.log("cache buffer: ", cached_buffer[_send_count]);
                     if(paused == false) {
                         if(cached_buffer[_send_count] != undefined) {
                             if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
