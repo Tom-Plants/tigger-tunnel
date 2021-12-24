@@ -36,7 +36,7 @@ function pk_handle(callback, referPort, mapper) {
                 push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
 
                 data_sync_timer = undefined;
-            }, 100);
+            }, 1);
         }else {
             if(pkt_num < recv_count || (pkt_num-recv_count) > 10000) {
             } else { buffer[pkt_num] = data; }
