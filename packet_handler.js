@@ -131,6 +131,7 @@ function st_handle(referPort) {
                     break;
                 }
 
+                console.log("清除", rp, sended_cache_point);
                 cached_buffer[sended_cache_point] = undefined;
 
                 sended_cache_point++;
