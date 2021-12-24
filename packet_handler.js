@@ -93,8 +93,8 @@ function st_handle(referPort) {
                                 paused = true;
                             }
                         }else {
-                            console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
                             if(data_sync_timer != undefined) {
+                                console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
                                 clearInterval(data_sync_timer);
                                 data_sync_timer = undefined;
                             }
