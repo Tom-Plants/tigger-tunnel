@@ -11,7 +11,7 @@ function pk_handle(callback, referPort, mapper) {
     let data_sync_timer = undefined;
     return (pkt_num, data) => {
         if(pkt_num == recv_count) {
-            console.log("接收到包", rp, recv_count, pkt_num);
+            //console.log("接收到包", rp, recv_count, pkt_num);
             cb(data, rp, recv_count);
             while(true) {
                 recv_count ++;
@@ -19,7 +19,7 @@ function pk_handle(callback, referPort, mapper) {
                     recv_count = 0
                 }
                 if(buffer[recv_count] != undefined) {
-                    console.log("接收到包", rp, recv_count, pkt_num);
+                    //console.log("接收到包", rp, recv_count, pkt_num);
                     cb(buffer[recv_count], rp, recv_count);
                     buffer[recv_count] = undefined;
                 }else break;
@@ -93,7 +93,7 @@ function st_handle(referPort) {
 
                     if(paused == false) {
                         if(cached_buffer[_send_count] != undefined) {
-                            console.log(_send_count);
+                            //console.log(_send_count);
                             if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
                                 paused = true;
                             }
@@ -110,7 +110,7 @@ function st_handle(referPort) {
                     }
                     _send_count++;
                 }
-            }, 1000 * 10);
+            }, 1000 * 1);
 
             return send_count++;
         },
@@ -126,7 +126,7 @@ function st_handle(referPort) {
                 return;
             }
 
-            console.log("接收到PTSYN的包", rp, count);
+            //console.log("接收到PTSYN的包", rp, count);
             synced_send_count = count;  //同步已经发送的单元
 
             while(true) {
