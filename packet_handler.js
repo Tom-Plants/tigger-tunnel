@@ -13,6 +13,7 @@ function pk_handle(callback, referPort, mapper) {
         if(pkt_num == recv_count) {
             //console.log("接收到包", rp, recv_count, pkt_num);
             cb(data, rp, recv_count);
+            buffer[recv_count] = undefined;
             while(true) {
                 recv_count ++;
                 if(recv_count == 32767) {
