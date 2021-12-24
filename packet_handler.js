@@ -10,8 +10,8 @@ function pk_handle(callback, referPort, mapper) {
     //延时通知对端已接受的包号
     let data_sync_timer = undefined;
     return (pkt_num, data) => {
-        console.log("接收到包", rp, recv_count, pkt_num);
         if(pkt_num == recv_count) {
+            console.log("接收到包", rp, recv_count, pkt_num);
             cb(data, rp, recv_count);
             while(true) {
                 recv_count ++;
