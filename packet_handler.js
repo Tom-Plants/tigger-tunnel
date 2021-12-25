@@ -75,6 +75,7 @@ function st_handle(referPort) {
             if(send_count == 32767) {
                 send_count = 0;
                 recv_ratio++;
+                console.log(rp, "升级拉，当前为", recv_ratio);
             }
 
             cached_buffer[real_pkg_num(send_count)] = data;
