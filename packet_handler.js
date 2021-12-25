@@ -93,7 +93,7 @@ function st_handle(referPort) {
                 //发送接收到的包的指针
                 console.log("发现", rp, "的", real_pkg_num(synced_send_count), "-", real_pkg_num(send_count)  , "需要重传");
 
-                let _send_count = real_pkg_num(synced_send_count);
+                let _send_count = synced_send_count;
                 while(true) {
 
                     if(_send_count == real_pkg_num(send_count)) {
@@ -108,7 +108,7 @@ function st_handle(referPort) {
                             }
                         }else {
                             if(data_sync_timer != undefined) {
-                                console.log(send_count, real_pkg_num(synced_send_count), _send_count, rp, "检测到无法传输的数据，关闭定时器");
+                                console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
                                 clearInterval(data_sync_timer);
                                 data_sync_timer = undefined;
                             }
