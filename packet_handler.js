@@ -122,7 +122,7 @@ function st_handle(referPort) {
             }
         },
         sync: (count) => {
-            if(count < synced_send_count || (count-synced_send_count) > 10000) {
+            if(count < synced_send_count && (count-synced_send_count) > 20000) {
                 //console.log("出现异样");
                 return;
             }
