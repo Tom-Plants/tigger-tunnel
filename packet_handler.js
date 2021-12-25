@@ -11,7 +11,7 @@ function pk_handle(callback, referPort, mapper) {
     //延时通知对端已接受的包号
     let data_sync_timer = undefined;
     let real_pkg_num = (pkt) => {
-        return recv_ratio * 32767 + pkt;
+        return recv_ratio * 1000 + pkt;
     }
     return (pkt_num, data) => {
         if(pkt_num == recv_count) {
@@ -20,7 +20,7 @@ function pk_handle(callback, referPort, mapper) {
             buffer[real_pkg_num(recv_count)] = undefined;
             while(true) {
                 recv_count ++;
-                if(recv_count == 32767) {
+                if(recv_count == 1000) {
                     recv_count = 0;
                     recv_ratio++;
                 }
@@ -68,11 +68,11 @@ function st_handle(referPort) {
     let recv_ratio = 0;
 
     let real_pkg_num = (pkt) => {
-        return recv_ratio * 32767 + pkt;
+        return recv_ratio * 1000 + pkt;
     }
     return {
         send: (data) => {
-            if(send_count == 32767) {
+            if(send_count == 1000) {
                 send_count = 0;
                 recv_ratio++;
                 console.log(rp, "升级拉，当前为", recv_ratio);
