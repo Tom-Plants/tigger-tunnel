@@ -1,8 +1,8 @@
 const {compress} = require("./async_compress");
 function mix(data, current_packet_num, referPort) {
-    let num_buffer = Buffer.allocUnsafe(4);
-    num_buffer.writeInt16LE(current_packet_num, 0);
-    num_buffer.writeUInt16LE(referPort, 2);
+    let num_buffer = Buffer.allocUnsafe(10);
+    num_buffer.writeBigInt64LE(current_packet_num, 0);
+    num_buffer.writeUInt16LE(referPort, 8);
 
     let length_buffer = Buffer.allocUnsafe(4);
 

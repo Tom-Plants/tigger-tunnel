@@ -6,28 +6,23 @@ function pk_handle(callback, referPort, mapper) {
     let buffer = {};
     let rp = referPort;
     let m = mapper;
-    let recv_ratio = 0;
     
     //延时通知对端已接受的包号
     let data_sync_timer = undefined;
-    let real_pkg_num = (pkt) => {
-        return recv_ratio * 1000 + pkt;
-    }
     return (pkt_num, data) => {
         if(pkt_num == recv_count) {
             //console.log("接收到包", rp, recv_count, pkt_num);
-            cb(data, rp, real_pkg_num(recv_count));
-            buffer[real_pkg_num(recv_count)] = undefined;
+            cb(data, rp, recv_count);
+            buffer[recv_count] = undefined;
             while(true) {
                 recv_count ++;
-                if(recv_count == 1000) {
-                    recv_count = 0;
-                    recv_ratio++;
-                }
-                if(buffer[real_pkg_num(recv_count)] != undefined) {
+                //if(recv_count == 1000) {
+                    //recv_ratio++;
+                //}
+                if(buffer[recv_count] != undefined) {
                     //console.log("接收到包", rp, recv_count, pkt_num);
-                    cb(buffer[real_pkg_num(recv_count)], rp, real_pkg_num(real_pkg_num));
-                    buffer[real_pkg_num(recv_count)] = undefined;
+                    cb(buffer[recv_count], rp, pkt_num);
+                    buffer[recv_count] = undefined;
                 }else break;
             }
 
@@ -37,13 +32,13 @@ function pk_handle(callback, referPort, mapper) {
             }
             data_sync_timer = setTimeout(() => {
                 //发送接收到的包的指针
-                console.log(rp, real_pkg_num(pkt_num), "同步");
-                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+                console.log(rp, pkt_num, "同步");
+                push_data(Buffer.from("PTSYN"), rp, recv_ratio);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
 
                 data_sync_timer = undefined;
             }, 1);
         }else {
-            if(real_pkg_num(pkt_num) < recv_count) {
+            if(pkt_num < recv_count) {
             } else { buffer[pkt_num] = data; }
         }
 
@@ -65,20 +60,14 @@ function st_handle(referPort) {
     let sended_cache_point = 0; //被它指到的单元还没释放
     let rp = referPort;
     let paused = false;
-    let recv_ratio = 0;
 
-    let real_pkg_num = (pkt) => {
-        return recv_ratio * 1000 + pkt;
-    }
     return {
         send: (data) => {
             if(send_count == 1000) {
                 send_count = 0;
-                recv_ratio++;
-                console.log(rp, "升级拉，当前为", recv_ratio);
             }
 
-            cached_buffer[real_pkg_num(send_count)] = data;
+            cached_buffer[send_count] = data;
 
             if(data_sync_timer != undefined) {
                 clearInterval(data_sync_timer);
@@ -86,17 +75,17 @@ function st_handle(referPort) {
             }
 
             data_sync_timer = setInterval(() => {
-                if(real_pkg_num(synced_send_count) == real_pkg_num(send_count)) {
+                if((synced_send_count) == send_count) {
                     //console.log("不需要重传");
                     return;
                 }
                 //发送接收到的包的指针
-                console.log("发现", rp, "的", real_pkg_num(synced_send_count), "-", real_pkg_num(send_count)  , "需要重传");
+                console.log("发现", rp, "的", (synced_send_count), "-", send_count  , "需要重传");
 
                 let _send_count = synced_send_count;
                 while(true) {
 
-                    if(_send_count == real_pkg_num(send_count)) {
+                    if(_send_count == send_count) {
                         break;
                     }
 
@@ -130,14 +119,14 @@ function st_handle(referPort) {
             }
         },
         sync: (count) => {
-            if(real_pkg_num(count) < real_pkg_num(synced_send_count)) {
+            if(count < synced_send_count) {
                 return;
             }
 
-            console.log("接收到同步信号", rp, real_pkg_num(count));
+            console.log("接收到同步信号", rp, count);
 
             //console.log("接收到PTSYN的包", rp, count);
-            synced_send_count = real_pkg_num(count);  //同步已经发送的单元
+            synced_send_count = count;  //同步已经发送的单元
 
             while(true) {
                 if(sended_cache_point == synced_send_count) {

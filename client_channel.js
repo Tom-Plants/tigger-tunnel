@@ -33,9 +33,9 @@ function new_client(mapper) {
     });
 
     let lkdata = recv_handle((data) => {
-        let pkt_num = data.readInt16LE(0);
-        let num = data.readUInt16LE(2);
-        let real_data = data.slice(4);
+        let pkt_num = data.readBigInt64LE(0);
+        let num = data.readUInt16LE(8);
+        let real_data = data.slice(10);
 
         if(real_data.length == 5) {
             
