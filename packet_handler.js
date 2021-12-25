@@ -126,6 +126,7 @@ function st_handle(referPort) {
                 //console.log("出现异样");
                 return;
             }
+            console.log("接收到同步信号", rp, count);
 
             //console.log("接收到PTSYN的包", rp, count);
             synced_send_count = count;  //同步已经发送的单元
