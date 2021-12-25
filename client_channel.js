@@ -49,6 +49,7 @@ function new_client(mapper) {
                     return;
                 }else if(cmd == "PFCLS") {
                     if(mapper[num] != undefined) {
+                        console.log(num, "被清理了");
                         mapper[num].sh.clean();
                         mapper[num].s.destroy();
                         mapper[num].rh = undefined;

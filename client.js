@@ -66,6 +66,7 @@ async function init_local_server() {
             send_data(Buffer.from("PTCLS"), referPort, cur);
             if(mapper[referPort] != undefined){
                 mapper[referPort].sh.clean();
+                console.log(referPort, "被清理了");
                 mapper[referPort].s.destroy();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;
@@ -100,6 +101,7 @@ function data_recive(data, referPort, pkt) {
             let cmd = data.toString();
             if(cmd == "PTCLS") {
                 mapper[referPort].sh.clean();
+                console.log(referPort, "被清理了");
                 mapper[referPort].s.destroy();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;

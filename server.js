@@ -77,6 +77,7 @@ function new_outgoing(num) {
         send_data(Buffer.from("PTCLS"), num, cur);
         if(mapper[num] != undefined) {
             mapper[num].sh.clean();
+            console.log(num, "被清理了");
             mapper[num].s.destroy();
             mapper[num].rh = undefined;
             mapper[num].sh = undefined;
@@ -100,6 +101,7 @@ function data_recive(data, referPort, pkt) {
             let cmd = data.toString();
             if(cmd == "PTCLS") {
                 mapper[referPort].sh.clean();
+                console.log(referPort, "被清理了");
                 mapper[referPort].s.destroy();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;
