@@ -63,9 +63,9 @@ function st_handle(referPort) {
 
     return {
         send: (data) => {
-            if(send_count == 1000) {
-                send_count = 0;
-            }
+            //if(send_count == 1000) {
+                //send_count = 0;
+            //}
 
             cached_buffer[send_count] = data;
 
