@@ -43,11 +43,11 @@ function pk_handle(callback, referPort, mapper) {
         }
 
 
-        if(m[rp] == undefined) {
-            console.log("强制关闭");
-            push_data(Buffer.from("PFCLS"), 0, -1);
-            return;
-        }
+        //if(m[rp] == undefined) {
+            //console.log("强制关闭");
+            //push_data(Buffer.from("PFCLS"), 0, -1);
+            //return;
+        //}
 
     }
 }
@@ -122,30 +122,31 @@ function st_handle(referPort) {
             }
         },
         sync: (count) => {
-            if(count < synced_send_count && ((synced_send_count-count) < 20000 || (count-synced_send_count) > 20000)) {
-                //console.log("出现异样");
-                return;
-            }
-            console.log("接收到同步信号", rp, count);
+            if(
+                ((synced_send_count > count) && ((synced_send_count - count) > 20000)) ||
+                ((count > synced_send_count) && ((count - synced_send_count) < 20000))
+            )
+            {
+                console.log("接收到同步信号", rp, count);
 
-            //console.log("接收到PTSYN的包", rp, count);
-            synced_send_count = count;  //同步已经发送的单元
+                //console.log("接收到PTSYN的包", rp, count);
+                synced_send_count = count;  //同步已经发送的单元
 
-            while(true) {
-                if(sended_cache_point == 32767) {
-                    sended_cache_point = 0;
+                while(true) {
+                    if(sended_cache_point == 32767) {
+                        sended_cache_point = 0;
+                    }
+
+                    if(sended_cache_point == synced_send_count) {
+                        break;
+                    }
+
+                    //console.log("清除", rp, sended_cache_point);
+                    cached_buffer[sended_cache_point] = undefined;
+
+                    sended_cache_point++;
                 }
-
-                if(sended_cache_point == synced_send_count) {
-                    break;
-                }
-
-                //console.log("清除", rp, sended_cache_point);
-                cached_buffer[sended_cache_point] = undefined;
-
-                sended_cache_point++;
             }
-
         },
         drain: () => {
             paused = false;
