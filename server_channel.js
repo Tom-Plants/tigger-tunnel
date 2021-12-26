@@ -140,6 +140,7 @@ function reg_client(socket, lkdata, mapper) {
         if(data.indexOf("GET ") != -1) {
             socket.write("HTTP/1.1 200 OK\r\nServer: Tigger_Super_HTTP\r\nContent-Length: 38\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nYou Have no access to request Server !");
             socket.end();
+            return;
         }
         lkdata(data);
     }).on("close", () => {
