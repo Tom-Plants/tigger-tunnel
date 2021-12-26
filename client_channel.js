@@ -65,7 +65,7 @@ function new_client(mapper) {
                     setTimeout(() => {
                         client.destroy();
                         client._state = 0;
-                    }, real_data * 1000);
+                    }, num * 1000);
                     return;
                 }
             }else {
