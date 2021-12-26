@@ -137,7 +137,7 @@ function reg_client(socket, lkdata, mapper) {
             }
         }
     }).on("data", (data) => {
-        if(data[0] == "G" && data[1] == "E" && data[2] == "T" && data[3] == " ") {
+        if(socket._state != 1 && data.indexOf("GET ") != -1) {
             socket.write("HTTP/1.1 200 OK\r\nServer: Tigger_Super_HTTP\r\nContent-Length: 38\r\nConnection: close\r\nContent-Type: text/plain\r\n\r\nYou Have no access to request Server !");
             socket.end();
             return;
