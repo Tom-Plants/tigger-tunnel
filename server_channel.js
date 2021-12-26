@@ -20,7 +20,8 @@ function init_server(mapper, new_outgoing) {
     tls.createServer({
         cert: fs.readFileSync("./cert.cert"),
         key: fs.readFileSync("./key.key"),
-        ca: fs.readFileSync("./ca.ca")
+        ca: fs.readFileSync("./ca.ca"),
+        allowHalfOpen: true
     }, (socket) => {
         let lkdata = recv_handle((data) => {
             let pkt_num = data.readBigInt64LE(0);
@@ -66,7 +67,7 @@ function init_server(mapper, new_outgoing) {
 
                         setTimeout(() => {
                             socket.end();
-                            socket._state = 0;
+                            socket._state = 2;
                             //let login = mix(Buffer.from("TLEND"), -1, 0);
                             //socket.write(login);
                             //setTimeout(() => {
@@ -124,7 +125,7 @@ function init_server(mapper, new_outgoing) {
 function reg_client(socket, lkdata, mapper) {
     socket.on("error", (e) => {
         console.log(e);
-        socket._state = 0;
+        socket._state = 2;
     }).on("drain", () => {
         socket._paused = false;
         let s_rtn = clear_data();
@@ -145,7 +146,10 @@ function reg_client(socket, lkdata, mapper) {
         lkdata(data);
     }).on("close", () => {
         socket._state = 0;
-    }).setKeepAlive(true, 1000 * 20);
+    }).on("end", () => {
+        socket.end();
+        socket._state = 2;
+    }).setKeepAlive(true, 1000);
 
     socket._auth_timer = setTimeout(() => {
         socket._state = 2;

@@ -17,7 +17,7 @@ function new_client(mapper) {
         {
             host: target_host,
             port: target_port,
-            //allowHalfOpen: true,
+            allowHalfOpen: true,
             //ca: fs.readFileSync("./certificate.pem"),
             
         }, () => {
@@ -60,6 +60,7 @@ function new_client(mapper) {
                 }else if(cmd == "TLREG") {
                     if(!push_client(client)) {
                         client.destroy();
+                        return;
                     }
                     return;
                 }
@@ -86,7 +87,7 @@ function new_client(mapper) {
     
     client.on("error", (e) => {
         console.log(e);
-        client._state = 0;
+        socket._state = 2;
     }).on("drain", () => {
         client._paused = false;
         let s_rtn = clear_data();
@@ -102,7 +103,10 @@ function new_client(mapper) {
         lkdata(data);
     }).on("close", () => {
         client._state = 0;
-    }).setKeepAlive(true, 1000 * 30);
+    }).on("end", () => {
+        client.end();
+        client._state = 2;
+    }).setKeepAlive(true, 1000);
 }
 
 function init_clients(mapper) {
