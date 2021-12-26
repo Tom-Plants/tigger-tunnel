@@ -87,7 +87,7 @@ function new_client(mapper) {
     
     client.on("error", (e) => {
         console.log(e);
-        socket._state = 2;
+        client._state = 2;
     }).on("drain", () => {
         client._paused = false;
         let s_rtn = clear_data();
