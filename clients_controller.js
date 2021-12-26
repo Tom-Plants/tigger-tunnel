@@ -36,6 +36,7 @@ function push_client(client) {
             return true;
         }
     }
+    client._state = 0;
     return false;
 }
 
