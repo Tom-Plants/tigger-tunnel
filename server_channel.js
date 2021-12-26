@@ -62,19 +62,21 @@ function init_server(mapper, new_outgoing) {
                             return;
                         }
 
-                        let ack = mix(Buffer.from("TLREG"), -1, 0);
+                        let timeout = randomInt(min_tunnel_timeout, max_tunnel_timeout);
+
+                        let ack = mix(Buffer.from("TLREG"), -1, timeout);
                         socket.write(ack);
 
                         setTimeout(() => {
-                            socket.end();
-                            socket._state = 2;
+                            socket.destroy();
+                            socket._state = 0;
                             //let login = mix(Buffer.from("TLEND"), -1, 0);
                             //socket.write(login);
                             //setTimeout(() => {
                                 //socket.end();
                                 //socket._state = 0;
                             //}, 1000 * 10);
-                        }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
+                        }, 1000 * timeout);
 
                         socket.emit("drain");
                         return;
