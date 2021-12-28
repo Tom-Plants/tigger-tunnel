@@ -74,42 +74,43 @@ function st_handle(referPort) {
                 //data_sync_timer = undefined;
             //}
 
-            data_sync_timer = setInterval(() => {
-                if((synced_send_count) == send_count) {
-                    //console.log("不需要重传");
-                    return;
-                }
-                //发送接收到的包的指针
-                console.log("发现", rp, "的", (synced_send_count), "-", send_count  , "需要重传");
-
-                let _send_count = synced_send_count;
-                while(true) {
-
-                    if(_send_count == send_count) {
-                        break;
+            if(data_sync_timer == undefined) {
+                data_sync_timer = setInterval(() => {
+                    if((synced_send_count) == send_count) {
+                        //console.log("不需要重传");
+                        return;
                     }
+                    //发送接收到的包的指针
+                    console.log("发现", rp, "的", (synced_send_count), "-", send_count  , "需要重传");
 
-                    if(paused == false) {
-                        if(cached_buffer[_send_count] != undefined) {
-                            //console.log(_send_count);
-                            if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
-                                paused = true;
+                    let _send_count = synced_send_count;
+                    while(true) {
+
+                        if(_send_count == send_count) {
+                            break;
+                        }
+
+                        if(paused == false) {
+                            if(cached_buffer[_send_count] != undefined) {
+                                //console.log(_send_count);
+                                if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                                    paused = true;
+                                }
+                            }else {
+                                if(data_sync_timer != undefined) {
+                                    console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
+                                    clearInterval(data_sync_timer);
+                                    data_sync_timer = undefined;
+                                }
+
                             }
                         }else {
-                            if(data_sync_timer != undefined) {
-                                console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
-                                clearInterval(data_sync_timer);
-                                data_sync_timer = undefined;
-                            }
-
+                            //console.log("通道正忙");
                         }
-                    }else {
-                        //console.log("通道正忙");
+                        _send_count++;
                     }
-                    _send_count++;
-                }
-            }, 1000 * 1);
-
+                }, 200 * 1);
+            }
             return send_count++;
         },
         clean: () => {
