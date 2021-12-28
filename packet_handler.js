@@ -69,10 +69,10 @@ function st_handle(referPort) {
 
             cached_buffer[send_count] = data;
 
-            if(data_sync_timer != undefined) {
-                clearInterval(data_sync_timer);
-                data_sync_timer = undefined;
-            }
+            //if(data_sync_timer != undefined) {
+                //clearInterval(data_sync_timer);
+                //data_sync_timer = undefined;
+            //}
 
             data_sync_timer = setInterval(() => {
                 if((synced_send_count) == send_count) {
@@ -108,7 +108,7 @@ function st_handle(referPort) {
                     }
                     _send_count++;
                 }
-            }, 1000 * 1);
+            }, 200 * 1);
 
             return send_count++;
         },
