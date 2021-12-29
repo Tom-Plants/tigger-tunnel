@@ -10,6 +10,15 @@ function pk_handle(callback, referPort, mapper) {
     //延时通知对端已接受的包号
     let data_sync_timer = undefined;
     return (pkt_num, data) => {
+        //每次进入都设定
+        if(data_sync_timer == undefined) {
+            data_sync_timer = setInterval(() => {
+                //发送接收到的包的指针
+                console.log(rp, pkt_num, "同步");
+                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+            }, 1000);
+        }
+
         if(pkt_num == recv_count) {
             //console.log("接收到包", rp, recv_count, pkt_num);
             cb(data, rp, recv_count);
@@ -24,31 +33,11 @@ function pk_handle(callback, referPort, mapper) {
                     cb(buffer[recv_count], rp, pkt_num);
                     buffer[recv_count] = undefined;
 
-                    if(data_sync_timer != undefined) {
-                        clearTimeout(data_sync_timer);
-                        data_sync_timer = undefined;
-                    }
-                    data_sync_timer = setTimeout(() => {
-                        //发送接收到的包的指针
-                        console.log(rp, pkt_num, "同步");
-                        push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
-
-                        data_sync_timer = undefined;
-                    }, 1);
                 }else break;
             }
 
-            if(data_sync_timer != undefined) {
-                clearTimeout(data_sync_timer);
-                data_sync_timer = undefined;
-            }
-            data_sync_timer = setTimeout(() => {
-                //发送接收到的包的指针
-                console.log(rp, pkt_num, "同步");
-                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
-
-                data_sync_timer = undefined;
-            }, 1);
+            clearInterval(data_sync_timer);
+            data_sync_timer = undefined;
         }else {
             if(pkt_num < recv_count) {
             } else { buffer[pkt_num] = data; }
