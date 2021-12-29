@@ -1,6 +1,6 @@
 const {createConnection} = require('net');
 const {recv_handle} = require("./rcv_buffer");
-const {target_host, target_port} = require("./config");
+const {target_host, target_port, min_tunnel_timeout, max_tunnel_timeout} = require("./config");
 const {clear_data} = require("./snd_buffer");
 const { push_client, need_new_client } = require('./clients_controller');
 const send_data = require("./snd_buffer").push_data;
@@ -9,6 +9,7 @@ const fs = require('fs');
 const config = require("./config");
 const mix = require("./mix_packet");
 const get_Q = require("./send_q_getter").get_port_send_Q;
+const { randomInt } = require('crypto');
 
 let timer_mapper = {};
 
@@ -61,6 +62,11 @@ function new_client(mapper) {
                     if(!push_client(client)) {
                         client.destroy();
                     }
+
+                    setTimeout(() => {
+                        client.destroy();
+                        client._state = 0;
+                    }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
                     return;
                 }
             }else {

@@ -65,7 +65,7 @@ function init_server(mapper, new_outgoing) {
                         socket.write(ack);
 
                         setTimeout(() => {
-                            socket.end();
+                            socket.destroy();
                             socket._state = 0;
                             //let login = mix(Buffer.from("TLEND"), -1, 0);
                             //socket.write(login);
@@ -149,7 +149,7 @@ function reg_client(socket, lkdata, mapper) {
 
     socket._auth_timer = setTimeout(() => {
         socket._state = 2;
-        socket.end();
+        socket.destroy();
     }, 1000 * 10);
 }
 
