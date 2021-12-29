@@ -74,7 +74,7 @@ function st_handle(referPort) {
                 //data_sync_timer = undefined;
             //}
 
-            if((BigInt(send_count) - BigInt(synced_send_count)) > 100) {
+            if((BigInt(send_count) - BigInt(synced_send_count)) > 50) {
                 if(mapper[rp] != undefined && mapper[rp]._cache_paused == false) {
                     mapper[rp]._cache_paused = true;
                     mapper[rp].s.pause();
@@ -137,7 +137,7 @@ function st_handle(referPort) {
             //console.log("接收到PTSYN的包", rp, count);
             synced_send_count = count;  //同步已经发送的单元
 
-            if((BigInt(send_count) - BigInt(count)) <= 10) {
+            if((BigInt(send_count) - BigInt(count)) <= 50) {
                 if(mapper[rp] != undefined) {
                     mapper[rp]._cache_paused = false;
                     socket.emit("drain");   //触发流完事件
