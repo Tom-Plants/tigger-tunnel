@@ -68,6 +68,7 @@ async function init_local_server() {
                 mapper[referPort].sh.clean();
                 console.log(referPort, "被清理了");
                 mapper[referPort].s.destroy();
+                mapper[referPort].rh.clean();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;
                 mapper[referPort] = undefined;
@@ -103,6 +104,7 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].sh.clean();
                 console.log(referPort, "被清理了");
                 mapper[referPort].s.destroy();
+                mapper[referPort].rh.clean();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;
                 mapper[referPort] = undefined;

@@ -48,6 +48,7 @@ function init_server(mapper, new_outgoing) {
                             mapper[num].sh.clean();
                             console.log(num, "被清理了");
                             mapper[num].s.destroy();
+                            mapper[num].rh.clean();
                             mapper[num].rh = undefined;
                             mapper[num].sh = undefined;
                             mapper[num] = undefined;
@@ -91,7 +92,7 @@ function init_server(mapper, new_outgoing) {
             }
 
             if(mapper[num] != undefined) {
-                mapper[num].rh(pkt_num, real_data);
+                mapper[num].rh.recv(pkt_num, real_data);
             }
 
         });

@@ -80,6 +80,7 @@ function new_outgoing(num) {
             mapper[num].sh.clean();
             console.log(num, "被清理了");
             mapper[num].s.destroy();
+            mapper[num].rh.clean();
             mapper[num].rh = undefined;
             mapper[num].sh = undefined;
             mapper[num] = undefined;
@@ -104,6 +105,7 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].sh.clean();
                 console.log(referPort, "被清理了");
                 mapper[referPort].s.destroy();
+                mapper[referPort].rh.clean();
                 mapper[referPort].rh = undefined;
                 mapper[referPort].sh = undefined;
                 mapper[referPort] = undefined;

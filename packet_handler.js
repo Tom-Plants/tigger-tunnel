@@ -9,7 +9,7 @@ function pk_handle(callback, referPort, mapper) {
     
     //延时通知对端已接受的包号
     let data_sync_timer = undefined;
-    return (pkt_num, data) => {
+    return { recv: (pkt_num, data) => {
         //每次进入都设定
         if(data_sync_timer == undefined) {
             data_sync_timer = setInterval(() => {
@@ -36,8 +36,6 @@ function pk_handle(callback, referPort, mapper) {
                 }else break;
             }
 
-            clearInterval(data_sync_timer);
-            data_sync_timer = undefined;
         }else {
             if(pkt_num < recv_count) {
             } else { buffer[pkt_num] = data; }
@@ -52,7 +50,10 @@ function pk_handle(callback, referPort, mapper) {
             //return;
         //}
 
-    }
+    }, clean: () => {
+        clearInterval(data_sync_timer);
+        data_sync_timer = undefined;
+    }}
 }
 
 function st_handle(referPort) {
