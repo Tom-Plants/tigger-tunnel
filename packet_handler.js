@@ -137,7 +137,7 @@ function st_handle(referPort) {
             synced_send_count = count;  //同步已经发送的单元
 
             if((BigInt(send_count) - BigInt(count)) <= 10) {
-                if(mapper[rp] != undefined && mapper[rp]._cache_paused == true) {
+                if(mapper[rp] != undefined) {
                     mapper[rp]._cache_paused = false;
                     socket.emit("drain");   //触发流完事件
                 }
