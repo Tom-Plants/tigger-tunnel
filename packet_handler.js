@@ -42,7 +42,7 @@ function pk_handle(callback, referPort, mapper) {
             } else { buffer[pkt_num] = data; }
         }
 
-        console.log("当前需要", recv_count);
+        console.log("当前需要", recv_count, "但发过来的是", pkt_num);
 
 
         //if(m[rp] == undefined) {
