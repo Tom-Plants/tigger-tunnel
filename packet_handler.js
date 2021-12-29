@@ -89,6 +89,7 @@ function st_handle(referPort) {
                     }
                     //发送接收到的包的指针
                     console.log("发现", rp, "的", (synced_send_count), "-", send_count  , "需要重传");
+                    if(paused == true) console.log("通道正忙");
 
                     let _send_count = synced_send_count;
                     while(true) {
