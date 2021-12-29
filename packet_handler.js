@@ -42,6 +42,8 @@ function pk_handle(callback, referPort, mapper) {
             } else { buffer[pkt_num] = data; }
         }
 
+        console.log("当前需要", recv_count);
+
 
         //if(m[rp] == undefined) {
             //console.log("强制关闭");
