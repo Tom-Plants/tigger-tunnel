@@ -16,7 +16,7 @@ function pk_handle(callback, referPort, mapper) {
                 //发送接收到的包的指针
                 console.log(rp, pkt_num, "同步");
                 push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
-            }, 1000);
+            }, 500);
         }
 
         if(pkt_num == recv_count) {
@@ -41,7 +41,6 @@ function pk_handle(callback, referPort, mapper) {
             } else { buffer[pkt_num] = data; }
         }
 
-        console.log("当前需要", recv_count, "但发过来的是", pkt_num);
 
 
         //if(m[rp] == undefined) {
@@ -121,7 +120,7 @@ function st_handle(referPort) {
                         }
                         _send_count++;
                     }
-                }, 200 * 1);
+                }, 500 * 1);
             }
             return send_count++;
         },
