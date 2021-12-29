@@ -23,6 +23,18 @@ function pk_handle(callback, referPort, mapper) {
                     //console.log("接收到包", rp, recv_count, pkt_num);
                     cb(buffer[recv_count], rp, pkt_num);
                     buffer[recv_count] = undefined;
+
+                    if(data_sync_timer != undefined) {
+                        clearTimeout(data_sync_timer);
+                        data_sync_timer = undefined;
+                    }
+                    data_sync_timer = setTimeout(() => {
+                        //发送接收到的包的指针
+                        console.log(rp, pkt_num, "同步");
+                        push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+
+                        data_sync_timer = undefined;
+                    }, 1);
                 }else break;
             }
 
