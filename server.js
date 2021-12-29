@@ -50,20 +50,21 @@ function new_outgoing(num) {
         s:conn,
         sh: st(num),
         rh: ph(data_recive, num, mapper),
-        _paused: false
+        _paused: false,
+        _cache_paused: false
     };
 
     conn.on("connect", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh.send(Buffer.from("PTCTN"));
+        let cur = mapper[num].sh.send(Buffer.from("PTCTN"), mapper);
         send_data(Buffer.from("PTCTN"), num, cur);
     }).on("end", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh.send(Buffer.from("CHALF"));
+        let cur = mapper[num].sh.send(Buffer.from("CHALF"), mapper);
         send_data(Buffer.from("SHALF"), num, cur);
     }).on("data", (data) => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh.send(data);
+        let cur = mapper[num].sh.send(data, mapper);
         if((send_data(data, num, cur)) == false) {
             Object.keys(mapper).map((value) => {
                 if(mapper[value] != undefined) {
@@ -73,7 +74,7 @@ function new_outgoing(num) {
         }
     }).on("close", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh.send(Buffer.from("PTCLS"));
+        let cur = mapper[num].sh.send(Buffer.from("PTCLS"), mapper);
         send_data(Buffer.from("PTCLS"), num, cur);
         if(mapper[num] != undefined) {
             mapper[num].sh.clean();
@@ -89,7 +90,7 @@ function new_outgoing(num) {
     })
     .on("drain", () => {
         if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh.send(Buffer.from("PTCTN"));
+        let cur = mapper[num].sh.send(Buffer.from("PTCTN"), mapper);
         send_data(Buffer.from("PTCTN"), num, cur);
     }).setKeepAlive(true, 200);
 }
@@ -122,7 +123,7 @@ function data_recive(data, referPort, pkt) {
         }
 
         if(mapper[referPort].s.write(data) == false) {
-            let cur = mapper[referPort].sh.send(Buffer.from("PTSTP"));
+            let cur = mapper[referPort].sh.send(Buffer.from("PTSTP"), mapper);
             send_data(Buffer.from("PTSTP"), referPort, cur);
         }
     }

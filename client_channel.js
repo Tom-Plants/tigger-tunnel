@@ -73,7 +73,7 @@ function new_client(mapper) {
                 let cmd = real_data.toString();
                 if(cmd == "PTSYN") {
                     if(mapper[num] != undefined) {
-                        mapper[num].sh.sync(pkt_num);
+                        mapper[num].sh.sync(pkt_num, mapper);
                     }
                     return;
                 }
@@ -100,7 +100,7 @@ function new_client(mapper) {
             for(let j in mapper) {
                 if(mapper[j] != undefined) {
                     mapper[j].sh.drain();
-                    if(mapper[j]._paused == false) mapper[j].s.resume();
+                    if(mapper[j]._paused == false && mapper[j]._cache_paused == false) mapper[j].s.resume();
                 }
             }
         }
