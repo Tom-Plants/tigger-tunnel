@@ -1,4 +1,4 @@
-const {push_data} = require("./snd_buffer");
+const {push_data, unshift_data} = require("./snd_buffer");
 
 function pk_handle(callback, referPort, mapper) {
     let cb = callback;
@@ -15,7 +15,7 @@ function pk_handle(callback, referPort, mapper) {
             data_sync_timer = setInterval(() => {
                 //发送接收到的包的指针
                 console.log(rp, pkt_num, "同步");
-                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+                unshift_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
             }, 500);
         }
 
@@ -104,7 +104,7 @@ function st_handle(referPort) {
                         if(paused == false) {
                             if(cached_buffer[_send_count] != undefined) {
                                 //console.log(_send_count);
-                                if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                                if(unshift_data(cached_buffer[_send_count], rp, _send_count) == false) {
                                     paused = true;
                                 }
                             }else {
