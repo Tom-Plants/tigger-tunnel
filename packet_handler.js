@@ -35,17 +35,19 @@ function pk_handle(callback, referPort, mapper) {
         }
 
 
-        clearTimeout(data_sync_timer);
-        data_sync_timer = setTimeout(() => {
+        //clearTimeout(data_sync_timer);
+        //data_sync_timer = setTimeout(() => {
             //发送接收到的包的指针
-            console.log(rp, recv_count, "同步");
-            unshift_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
-        }, 100);
+        //}, 100);
         //if(m[rp] == undefined) {
             //console.log("强制关闭");
             //push_data(Buffer.from("PFCLS"), 0, -1);
             //return;
         //}
+        setImmediate(() => {
+            console.log(rp, recv_count, "同步");
+            unshift_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+        });
 
     }, clean: () => {
         //clearInterval(data_sync_timer);
