@@ -11,13 +11,6 @@ function pk_handle(callback, referPort, mapper) {
     let data_sync_timer = undefined;
     return { recv: (pkt_num, data) => {
         //每次进入都设定
-        if(data_sync_timer == undefined) {
-            data_sync_timer = setInterval(() => {
-                //发送接收到的包的指针
-                console.log(rp, pkt_num, "同步");
-                unshift_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
-            }, 1000);
-        }
 
         if(pkt_num == recv_count) {
             //console.log("接收到包", rp, recv_count, pkt_num);
@@ -42,7 +35,12 @@ function pk_handle(callback, referPort, mapper) {
         }
 
 
-
+        clearTimeout(data_sync_timer);
+        data_sync_timer = setTimeout(() => {
+            //发送接收到的包的指针
+            console.log(rp, recv_count, "同步");
+            unshift_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+        }, 100);
         //if(m[rp] == undefined) {
             //console.log("强制关闭");
             //push_data(Buffer.from("PFCLS"), 0, -1);
@@ -50,8 +48,8 @@ function pk_handle(callback, referPort, mapper) {
         //}
 
     }, clean: () => {
-        clearInterval(data_sync_timer);
-        data_sync_timer = undefined;
+        //clearInterval(data_sync_timer);
+        //data_sync_timer = undefined;
     }}
 }
 
@@ -120,7 +118,7 @@ function st_handle(referPort) {
                         }
                         _send_count++;
                     }
-                }, 2000 * 1);
+                }, 1000 * 1);
             }
             return send_count++;
         },
