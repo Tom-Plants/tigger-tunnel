@@ -66,7 +66,7 @@ function init_server(mapper, new_outgoing) {
                         socket.write(ack);
 
                         setTimeout(() => {
-                            socket.destroy();
+                            socket.end();
                             socket._state = 0;
                             //let login = mix(Buffer.from("TLEND"), -1, 0);
                             //socket.write(login);

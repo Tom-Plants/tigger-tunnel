@@ -62,10 +62,11 @@ function new_client(mapper) {
                 }else if(cmd == "TLREG") {
                     if(!push_client(client)) {
                         client.destroy();
+                        return;
                     }
 
                     setTimeout(() => {
-                        client.destroy();
+                        client.end();
                         client._state = 0;
                     }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
                     return;
