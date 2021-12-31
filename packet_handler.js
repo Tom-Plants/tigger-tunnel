@@ -104,7 +104,7 @@ function st_handle(referPort) {
                         if(paused == false) {
                             if(cached_buffer[_send_count] != undefined) {
                                 //console.log(_send_count);
-                                if(unshift_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                                if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
                                     paused = true;
                                 }
                             }else {
