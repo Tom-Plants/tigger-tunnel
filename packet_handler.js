@@ -100,49 +100,50 @@ function st_handle(referPort) {
                     let _send_count = synced_send_count;
 
 
-                    if (paused == false) {
-                        if (cached_buffer[_send_count] != undefined) {
-                            //console.log(_send_count);
-                            if (push_data(cached_buffer[_send_count], rp, _send_count) == false) {
-                                paused = true;
+                    // if (paused == false) {
+                    //     if (cached_buffer[_send_count] != undefined) {
+                    //         //console.log(_send_count);
+                    //         if (push_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                    //             paused = true;
+                    //         }
+                    //     } else {
+                    //         if (data_sync_timer != undefined) {
+                    //             console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
+                    //             clearInterval(data_sync_timer);
+                    //             data_sync_timer = undefined;
+                    //         }
+
+                    //     }
+                    // } else {
+                    //     //console.log("通道正忙");
+                    // }
+
+                    while (true) {
+
+                        if (_send_count == send_count) {
+                            break;
+                        }
+
+                        if (paused == false) {
+                            if (cached_buffer[_send_count] != undefined) {
+                                //console.log(_send_count);
+                                if (push_data(cached_buffer[_send_count], rp, _send_count) == false) {
+                                    paused = true;
+                                }
+                            } else {
+                                if (data_sync_timer != undefined) {
+                                    console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
+                                    clearInterval(data_sync_timer);
+                                    data_sync_timer = undefined;
+                                }
+
                             }
                         } else {
-                            if (data_sync_timer != undefined) {
-                                console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
-                                clearInterval(data_sync_timer);
-                                data_sync_timer = undefined;
-                            }
-
+                            //console.log("通道正忙");
+                            break;
                         }
-                    } else {
-                        //console.log("通道正忙");
+                        _send_count++;
                     }
-
-                    //while(true) {
-
-                    //if(_send_count == send_count) {
-                    //break;
-                    //}
-
-                    //if(paused == false) {
-                    //if(cached_buffer[_send_count] != undefined) {
-                    ////console.log(_send_count);
-                    //if(push_data(cached_buffer[_send_count], rp, _send_count) == false) {
-                    //paused = true;
-                    //}
-                    //}else {
-                    //if(data_sync_timer != undefined) {
-                    //console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
-                    //clearInterval(data_sync_timer);
-                    //data_sync_timer = undefined;
-                    //}
-
-                    //}
-                    //}else {
-                    ////console.log("通道正忙");
-                    //}
-                    //_send_count++;
-                    //}
                 }, 1000 * 1);
             }
             return send_count++;
