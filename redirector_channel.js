@@ -28,7 +28,6 @@ function init_server() {
         key: fs.readFileSync("./key.pem")
     }, (socket) => {
         let lkdata = recv_handle((data) => {
-            console.log(data);
             let pkt_num = data.readBigInt64LE(0);
             let num = data.readUInt16LE(8);
             let real_data = data.slice(10);
