@@ -3,7 +3,8 @@ const { recv_handle } = require("./rcv_buffer");
 //导入两个，懒得写
 const push_client_s = require("./clients_controller").push_client;//服务器用
 const resume_all_s = require("./clients_controller").resume_all;
-const { push_client, need_new_client, resume_all } = require('./clients_controller2');  //客户端用
+const pause_all_s = require("./clients_controller").pause_all;
+const { push_client, need_new_client, resume_all, pause_all } = require('./clients_controller2');  //客户端用
 
 //依旧导入两个，懒得写
 const clear_data_s = require("./snd_buffer").clear_data;    //服务器用
@@ -60,8 +61,8 @@ function init_server() {
                 }
             }
 
-            if (mapper[num] != undefined) {
-                mapper[num].rh.recv(pkt_num, real_data);
+            if(push_data(real_data, num, pkt_num) == false) {
+                pause_all_s();
             }
 
         });
@@ -73,7 +74,7 @@ function init_server() {
             }
         }
 
-        reg_client(socket, lkdata, mapper);
+        reg_client(socket, lkdata);
 
     }).listen({ port: s_local_port, host: s_local_host }).on("connection", (_socket) => {
         let timer = setTimeout(() => {
@@ -91,7 +92,7 @@ function init_server() {
     });
 }
 
-function reg_client(socket, lkdata, mapper) {
+function reg_client(socket, lkdata) {
     socket.on("error", (e) => {
         console.log(e);
         socket._state = 0;
@@ -99,12 +100,7 @@ function reg_client(socket, lkdata, mapper) {
         socket._paused = false;
         let s_rtn = clear_data();
         if (s_rtn == true) {
-            for (let i in mapper) {
-                if (mapper[i] != undefined) {
-                    mapper[i].sh.drain();
-                    if (mapper[i]._paused == false && mapper[i]._cache_paused == false) mapper[i].s.resume();
-                }
-            }
+            resume_all(); //对于服务器来说，流完了应该重新打开
         }
     }).on("data", (data) => {
         if (socket._state != 1 && data.indexOf("GET ") != -1) {
@@ -164,8 +160,8 @@ function new_client() {
         }
 
         //发到远端
-        if (push_data(real_data, num, pkt_num) == false) {
-            client.pause();
+        if (push_data_s(real_data, num, pkt_num) == false) {
+            pause_all();
         }
 
     });
@@ -180,7 +176,7 @@ function new_client() {
     }).on("drain", () => {
         let s_rtn = clear_data();
         if (s_rtn == true) {
-
+            resume_all_s();
         }
     }).on("data", (data) => {
         lkdata(data);
