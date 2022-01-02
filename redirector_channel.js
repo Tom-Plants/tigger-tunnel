@@ -62,7 +62,7 @@ function init_server() {
             }
 
             if(push_data(real_data, num, pkt_num) == false) {
-                pause_all_s();
+                socket.pause();
             }
 
         });
@@ -163,7 +163,7 @@ function new_client() {
 
         //发到远端
         if (push_data_s(real_data, num, pkt_num) == false) {
-            pause_all();
+            client.pause();
         }
 
     });
