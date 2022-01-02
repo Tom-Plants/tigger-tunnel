@@ -155,6 +155,8 @@ function new_client() {
                     client.end();
                     client._state = 0;
                 }, 1000 * randomInt(min_tunnel_timeout, max_tunnel_timeout));
+
+                client.emit("drain");
                 return;
             }
         }
