@@ -1,6 +1,6 @@
 const {createConnection} = require('net');
 const {recv_handle} = require("./rcv_buffer");
-const {target_host, target_port, min_tunnel_timeout, max_tunnel_timeout} = require("./config");
+const {min_tunnel_timeout, max_tunnel_timeout, targets} = require("./config");
 const {clear_data} = require("./snd_buffer");
 const { push_client, need_new_client } = require('./clients_controller');
 const send_data = require("./snd_buffer").push_data;
@@ -13,11 +13,11 @@ const { randomInt } = require('crypto');
 
 let timer_mapper = {};
 
-function new_client(mapper) {
+function new_client(mapper, target) {
     let client = tls.connect(
         {
-            host: target_host,
-            port: target_port,
+            host: target.host,
+            port: target.port
             //allowHalfOpen: true,
             //ca: fs.readFileSync("./certificate.pem"),
             
@@ -115,7 +115,9 @@ function new_client(mapper) {
 
 function init_clients(mapper) {
     if(need_new_client()) {
-        new_client(mapper);
+        for(let target of targets) {
+            new_client(mapper, target);
+        }
     }
 }
 
