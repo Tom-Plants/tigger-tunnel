@@ -23,9 +23,8 @@ let timer_mapper = {};
 
 function init_server() {
     tls.createServer({
-        //cert: fs.readFileSync("./cert.cert"),
-        //key: fs.readFileSync("./key.key"),
-        //ca: fs.readFileSync("./ca.ca")
+        cert: fs.readFileSync("./certificate.pem"),
+        key: fs.readFileSync("./key.pem")
     }, (socket) => {
         let lkdata = recv_handle((data) => {
             let pkt_num = data.readBigInt64LE(0);
