@@ -10,7 +10,7 @@ const clear_data_s = require("./snd_buffer").clear_data;    //服务器用
 const push_data_s = require("./snd_buffer").push_data;
 const { clear_data, push_data } = require("./snd_buffer2"); //客户端用
 
-const { s_local_port, s_local_host, max_tunnel_timeout, min_tunnel_timeout } = require("./config");
+const { s_local_port, s_local_host, max_tunnel_timeout, min_tunnel_timeout, target_host, target_port } = require("./config");
 
 const { randomInt } = require("crypto");
 
@@ -124,7 +124,7 @@ function reg_client(socket, lkdata, mapper) {
     }, 1000 * 10);
 }
 
-function new_client(mapper) {
+function new_client() {
     let client = tls.connect({
         host: target_host,
         port: target_port,
