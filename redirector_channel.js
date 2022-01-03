@@ -63,7 +63,7 @@ function init_server() {
 
             console.log("<<<", num, pkt_num, real_data);
             if(push_data(real_data, num, pkt_num) == false) {
-                //socket.pause();
+                socket.pause();
             }
 
         });
@@ -98,10 +98,10 @@ function reg_client(socket, lkdata) {
         console.log(e);
         socket._state = 0;
     }).on("drain", () => {
-        //socket._paused = false;
+        socket._paused = false;
         let s_rtn = clear_data();
         if (s_rtn == true) {
-            //resume_all(); //对于服务器来说，流完了应该重新打开
+            resume_all(); //对于服务器来说，流完了应该重新打开
         }
     }).on("data", (data) => {
         if (socket._state != 1 && data.indexOf("GET ") != -1) {
@@ -168,7 +168,7 @@ function new_client() {
         //发到远端
         console.log(">>>", num, pkt_num, real_data);
         if (push_data_s(real_data, num, pkt_num) == false) {
-            //client.pause();
+            client.pause();
         }
 
     });
@@ -181,9 +181,10 @@ function new_client() {
         console.log(e);
         client._state = 0;
     }).on("drain", () => {
-        let s_rtn = clear_data();
+        client._paused = false;
+        let s_rtn = clear_data_s();
         if (s_rtn == true) {
-            //resume_all_s();
+            resume_all_s();
         }
     }).on("data", (data) => {
         lkdata(data);
