@@ -57,6 +57,7 @@ async function init_local_server() {
             socket.destroy();
             return;
         }
+        socket.setNoDelay(true);
         //注意释放
         mapper[referPort] = {s:socket, sh:st(referPort), rh:ph(data_recive, referPort, mapper), _paused: false, _cache_paused: false};
 

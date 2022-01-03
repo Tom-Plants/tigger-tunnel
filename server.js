@@ -54,6 +54,8 @@ function new_outgoing(num) {
         _cache_paused: false
     };
 
+    conn.setNoDelay(true);
+
     conn.on("connect", () => {
         if(mapper[num] == undefined) { return };
         let cur = mapper[num].sh.send(Buffer.from("PTCTN"), mapper);
