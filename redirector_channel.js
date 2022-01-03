@@ -61,7 +61,7 @@ function init_server() {
                 }
             }
 
-            console.log(num, pkt_num, real_data);
+            console.log("<<<", num, pkt_num, real_data);
             if(push_data(real_data, num, pkt_num) == false) {
                 //socket.pause();
             }
@@ -166,7 +166,7 @@ function new_client() {
         }
 
         //发到远端
-        console.log(num, pkt_num, real_data);
+        console.log(">>>", num, pkt_num, real_data);
         if (push_data_s(real_data, num, pkt_num) == false) {
             //client.pause();
         }
