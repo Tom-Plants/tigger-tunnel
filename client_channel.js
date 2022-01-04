@@ -80,7 +80,7 @@ function new_client(mapper, target) {
                     return;
                 }else if(cmd == "PTRCV") {
                     if(mapper[num] != undefined) {
-                        mapper[num].sh.recv(pkt_num, mapper, socket);
+                        mapper[num].sh.recv(pkt_num, mapper, client);
                     }
                 }
             }
