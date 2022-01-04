@@ -3,6 +3,7 @@ const ph = require("./packet_handler").pk_handle;
 const st = require("./packet_handler").st_handle;
 const {init_clients} = require("./client_channel");
 const send_data = require("./snd_buffer").push_data;
+const {unshift_data} = require("./snd_buffer");
 const {local_port, local_host} = require("./config");
 const {init_compress} = require("./async_compress");
 const {k} = require("./async_compress");
@@ -64,7 +65,7 @@ async function init_local_server() {
         socket.on("close", () => {
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh.send(Buffer.from("PTCLS"), mapper);
-            send_data(Buffer.from("PTCLS"), referPort, cur);
+            unshift_data(Buffer.from("PTCLS"), referPort, cur);
             if(mapper[referPort] != undefined){
                 mapper[referPort].sh.clean();
                 console.log(referPort, "被清理了");
@@ -77,7 +78,7 @@ async function init_local_server() {
         }).on("end", () => {
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh.send(Buffer.from("CHALF"), mapper);
-            send_data(Buffer.from("CHALF"), referPort, cur);
+            unshift_data(Buffer.from("CHALF"), referPort, cur);
         }).on("data", (data) => {
             if(mapper[referPort] == undefined) {return};
             let cur = mapper[referPort].sh.send(data, mapper);
@@ -90,10 +91,10 @@ async function init_local_server() {
         .on("drain", () => {
             if(mapper[referPort] == undefined) { return };
             let cur = mapper[referPort].sh.send(Buffer.from("PTCTN"), mapper);
-            send_data(Buffer.from("PTCTN"), referPort, cur);
+            unshift_data(Buffer.from("PTCTN"), referPort, cur);
         }).setKeepAlive(true, 200);
 
-        send_data(Buffer.from("COPEN"), referPort, -1);
+        unshift_data(Buffer.from("COPEN"), referPort, -1);
     }).listen({port: local_port, host: local_host});
 }
 
@@ -126,7 +127,7 @@ function data_recive(data, referPort, pkt) {
         }
         if(mapper[referPort].s.write(data) == false) {
             let cur = mapper[referPort].sh.send(Buffer.from("PTSTP"), mapper);
-            send_data(Buffer.from("PTSTP"), referPort, cur);
+            unshift_data(Buffer.from("PTSTP"), referPort, cur);
         }
     }
 }
