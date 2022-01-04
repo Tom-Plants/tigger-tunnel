@@ -51,7 +51,6 @@ function new_outgoing(num) {
         s:conn,
         sh: st(num),
         rh: ph(data_recive, num, mapper),
-        _paused: false,
         _cache_paused: false
     };
 
@@ -93,9 +92,9 @@ function new_outgoing(num) {
         console.log(e);
     })
     .on("drain", () => {
-        if(mapper[num] == undefined) { return };
-        let cur = mapper[num].sh.send(Buffer.from("PTCTN"), mapper);
-        unshift_data(Buffer.from("PTCTN"), num, cur);
+        //if(mapper[num] == undefined) { return };
+        //let cur = mapper[num].sh.send(Buffer.from("PTCTN"), mapper);
+        //unshift_data(Buffer.from("PTCTN"), num, cur);
     }).setKeepAlive(true, 200);
 }
 
@@ -117,12 +116,12 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].s.end();
                 return;
             }else if(cmd == "PTCTN") {
-                mapper[referPort]._paused = false;
-                mapper[referPort].s.resume();
+                //mapper[referPort]._paused = false;
+                //mapper[referPort].s.resume();
                 return;
             }else if(cmd == "PTSTP") {
-                mapper[referPort]._paused = true;
-                mapper[referPort].s.pause();
+                //mapper[referPort]._paused = true;
+                //mapper[referPort].s.pause();
                 return;
             }
         }

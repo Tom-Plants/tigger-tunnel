@@ -17,9 +17,13 @@ function new_client(mapper, target) {
     let client = tls.connect(
         {
             host: target.host,
-            port: target.port
+            port: target.port,
             //allowHalfOpen: true,
             //ca: fs.readFileSync("./certificate.pem"),
+            ca: fs.readFileSync("./certificate.pem"),
+            checkServerIdentity: (host, cert) => {
+                return undefined;
+            }
             
         }, () => {
 
@@ -107,7 +111,7 @@ function new_client(mapper, target) {
             for(let j in mapper) {
                 if(mapper[j] != undefined) {
                     mapper[j].sh.drain();
-                    if(mapper[j]._paused == false && mapper[j]._cache_paused == false) mapper[j].s.resume();
+                    if(mapper[j]._cache_paused == false) mapper[j].s.resume();
                 }
             }
         }

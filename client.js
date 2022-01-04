@@ -60,7 +60,7 @@ async function init_local_server() {
         }
         socket.setNoDelay(true);
         //注意释放
-        mapper[referPort] = {s:socket, sh:st(referPort), rh:ph(data_recive, referPort, mapper), _paused: false, _cache_paused: false};
+        mapper[referPort] = {s:socket, sh:st(referPort), rh:ph(data_recive, referPort, mapper), _cache_paused: false};
 
         socket.on("close", () => {
             if(mapper[referPort] == undefined) { return };
@@ -89,9 +89,9 @@ async function init_local_server() {
             }
         }).on("error", () => {})
         .on("drain", () => {
-            if(mapper[referPort] == undefined) { return };
-            let cur = mapper[referPort].sh.send(Buffer.from("PTCTN"), mapper);
-            unshift_data(Buffer.from("PTCTN"), referPort, cur);
+            //if(mapper[referPort] == undefined) { return };
+            //let cur = mapper[referPort].sh.send(Buffer.from("PTCTN"), mapper);
+            //unshift_data(Buffer.from("PTCTN"), referPort, cur);
         }).setKeepAlive(true, 200);
 
         unshift_data(Buffer.from("COPEN"), referPort, -1);
@@ -119,8 +119,8 @@ function data_recive(data, referPort, pkt) {
                 mapper[referPort].s.resume();
                 return;
             }else if(cmd == "PTSTP") {
-                mapper[referPort]._paused = true;
-                mapper[referPort].s.pause();
+                //mapper[referPort]._paused = true;
+                //mapper[referPort].s.pause();
                 return;
             }
 

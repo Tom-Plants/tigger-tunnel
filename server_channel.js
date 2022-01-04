@@ -138,7 +138,7 @@ function reg_client(socket, lkdata, mapper) {
             for(let i in mapper) {
                 if(mapper[i] != undefined) {
                     mapper[i].sh.drain();
-                    if(mapper[i]._paused == false && mapper[i]._cache_paused == false) mapper[i].s.resume();
+                    if(mapper[i]._cache_paused == false) mapper[i].s.resume();
                 }
             }
         }
