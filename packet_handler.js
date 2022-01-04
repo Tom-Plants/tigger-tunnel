@@ -31,7 +31,6 @@ function pk_handle(callback, referPort, mapper) {
                 }
 
 
-                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
             } else {
                 if (pkt_num < recv_count) {
                 } else {
@@ -43,6 +42,7 @@ function pk_handle(callback, referPort, mapper) {
             }
 
 
+            push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
             //setImmediate(() => {
                 //console.log(rp, recv_count, "同步");
                 //push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
