@@ -2,15 +2,6 @@ const {tunnel_num} = require("./config");
 const {Socket} = require("net");
 
 /**
- * @var {Array<Socket>} clients
- */
-let clients = [];
-/**
- * @var {Number} client_pointer
- */
-let client_pointer = 0;
-
-/**
  * 恢复所有客户端的传入
  */
 function resume_all() {
@@ -32,6 +23,15 @@ function pause_all() {
         }
     }
 }
+
+/**
+ * @var {Array<Socket>} clients
+ */
+let clients = [];
+/**
+ * @var {Number} client_pointer
+ */
+let client_pointer = 0;
 
 /**
  * 返回true，添加成功，返回false，添加失败
