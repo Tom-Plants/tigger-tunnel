@@ -33,16 +33,17 @@ function pk_handle(callback, referPort, mapper) {
 
             } else {
                 if (pkt_num < recv_count) {
+                    push_data(Buffer.from("PTSYN"), rp, recv_count);    //强制同步
                 } else {
                     buffer[pkt_num] = data;
 
                     console.log(rp, recv_count, "同步");
-                    push_data(Buffer.from("PTRCV"), rp, pkt_num);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+                    push_data(Buffer.from("PTRCV"), rp, pkt_num);    //通知重传端有部分数据不需要重发
                 }
             }
 
 
-            push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+            //push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
             //setImmediate(() => {
                 //console.log(rp, recv_count, "同步");
                 //push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送

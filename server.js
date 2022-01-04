@@ -127,9 +127,14 @@ function data_recive(data, referPort, pkt) {
             }
         }
 
-        if(mapper[referPort].s.write(data) == false) {
-            let cur = mapper[referPort].sh.send(Buffer.from("PTSTP"), mapper);
-            unshift_data(Buffer.from("PTSTP"), referPort, cur);
-        }
+        //if(
+        mapper[referPort].s.write(data, () => {
+            //成功写出，通知服务端
+            send_data(Buffer.from("PTSYN"), referPort, pkt);
+        });
+        // == false) {
+            //let cur = mapper[referPort].sh.send(Buffer.from("PTSTP"), mapper);
+            //unshift_data(Buffer.from("PTSTP"), referPort, cur);
+        //}
     }
 }
