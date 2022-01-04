@@ -82,6 +82,7 @@ function new_client(mapper, target) {
                     if(mapper[num] != undefined) {
                         mapper[num].sh.recv(pkt_num, mapper, client);
                     }
+                    return;
                 }
             }
         }

@@ -90,6 +90,7 @@ function init_server(mapper, new_outgoing) {
                         if(mapper[num] != undefined) {
                             mapper[num].sh.recv(pkt_num, mapper, socket);
                         }
+                        return;
                     }
                 }
 
