@@ -1,4 +1,5 @@
 const { push_data, unshift_data } = require("./snd_buffer");
+const config = require("./config");
 
 function pk_handle(callback, referPort, mapper) {
     let cb = callback;
@@ -159,7 +160,7 @@ function st_handle(referPort) {
                         }
                         _send_count++;
                     }
-                }, 1000 * 1);
+                }, 1000 * config.sync_timeout);
             }
             return send_count++;
         },

@@ -8,6 +8,7 @@ const {local_port, local_host} = require("./config");
 const {init_compress} = require("./async_compress");
 const {k} = require("./async_compress");
 const {clients} = require("./clients_controller");
+const config = require("./config");
     
 
 let     mapper = {};
@@ -17,7 +18,7 @@ init_local_server();
 setInterval(() => {
     init_clients(mapper);
     //show_mapper(mapper);
-}, 1000);
+}, config.connect_interval * 1000);
 
 setInterval(() => {
     check_dead_conn(mapper);
