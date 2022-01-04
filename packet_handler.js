@@ -33,14 +33,28 @@ function pk_handle(callback, referPort, mapper) {
 
             } else {
                 if (pkt_num < recv_count) {
-                } else { buffer[pkt_num] = data; }
+                } else {
+                    buffer[pkt_num] = data;
+
+                    setImmediate(() => {
+                        console.log(rp, recv_count, "同步");
+                        push_data(Buffer.from("PTRCV"), rp, pkt_num);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+                    });
+                }
             }
 
 
-            setImmediate(() => {
-                console.log(rp, recv_count, "同步");
-                push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
-            });
+            //setImmediate(() => {
+                //console.log(rp, recv_count, "同步");
+                //push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+            //});
+
+            if(data_sync_timer == undefined) {
+                data_sync_timer = setInterval(() => {
+                    console.log(rp, recv_count, "同步");
+                    push_data(Buffer.from("PTSYN"), rp, recv_count);    //请求重传包, 如果重传包没发到位，则定时器会控制继续发送
+                }, 1000);
+            }
             //clearTimeout(data_sync_timer);
             //data_sync_timer = setTimeout(() => {
             //发送接收到的包的指针
@@ -52,8 +66,8 @@ function pk_handle(callback, referPort, mapper) {
             //}
 
         }, clean: () => {
-            //clearInterval(data_sync_timer);
-            //data_sync_timer = undefined;
+            clearInterval(data_sync_timer);
+            data_sync_timer = undefined;
         }
     }
 }
@@ -131,11 +145,11 @@ function st_handle(referPort) {
                                     paused = true;
                                 }
                             } else {
-                                if (data_sync_timer != undefined) {
-                                    console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
-                                    clearInterval(data_sync_timer);
-                                    data_sync_timer = undefined;
-                                }
+                                //if (data_sync_timer != undefined) {
+                                    //console.log(send_count, synced_send_count, _send_count, rp, "检测到无法传输的数据，关闭定时器");
+                                    //clearInterval(data_sync_timer);
+                                    //data_sync_timer = undefined;
+                                //}
 
                             }
                         } else {
@@ -153,6 +167,9 @@ function st_handle(referPort) {
                 clearInterval(data_sync_timer);
                 data_sync_timer = undefined;
             }
+        },
+        recv: (count, mapper, socket) => {
+            cached_buffer[count] = undefined;
         },
         sync: (count, mapper, socket) => {
             if (count < synced_send_count) {

@@ -78,6 +78,10 @@ function new_client(mapper, target) {
                         mapper[num].sh.sync(pkt_num, mapper, client);
                     }
                     return;
+                }else if(cmd == "PTRCV") {
+                    if(mapper[num] != undefined) {
+                        mapper[num].sh.recv(pkt_num, mapper, socket);
+                    }
                 }
             }
         }
