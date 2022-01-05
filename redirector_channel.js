@@ -27,7 +27,7 @@ function init_server() {
         cert: fs.readFileSync("./certificate.pem"),
         key: fs.readFileSync("./key.pem")
     }, (socket) => {
-        socket.setNoDelay(true);
+        //socket.setNoDelay(true);
         let lkdata = recv_handle((data) => {
             let pkt_num = data.readBigInt64LE(0);
             let num = data.readUInt16LE(8);
@@ -141,7 +141,7 @@ function new_client() {
         client.write(login);
     });
 
-    client.setNoDelay(true);
+    //client.setNoDelay(true);
 
     let lkdata = recv_handle((data) => {
         let pkt_num = data.readBigInt64LE(0);

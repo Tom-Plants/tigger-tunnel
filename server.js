@@ -54,7 +54,7 @@ function new_outgoing(num) {
         _cache_paused: false
     };
 
-    conn.setNoDelay(true);
+    //conn.setNoDelay(true);
 
     conn.on("connect", () => {
         if(mapper[num] == undefined) { return };
